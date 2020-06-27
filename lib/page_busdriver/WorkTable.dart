@@ -1,6 +1,5 @@
-import 'package:gradient_app_bar/gradient_app_bar.dart';
+
 import 'package:flutter/material.dart';
-import 'package:getflutter/getflutter.dart';
 
 class WorkTablePage extends StatefulWidget{
   @override
@@ -40,29 +39,6 @@ class _WorkTablePageState extends State<WorkTablePage>{
         color: Colors.white,
         child: Column(
           children: <Widget>[
-            GFSearchBar(
-              searchList: list,
-              searchQueryBuilder: (query, list){
-                return list
-                  .where((item) => 
-                    item.toLowerCase().contains(query.toLowerCase()))
-                  .toList();
-              },
-              overlaySearchListItemBuilder: (item){
-                return Container(
-                  padding: const EdgeInsets.all(8),
-                  child: Text(
-                    item,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                );
-              },
-              onItemSelected: (item){
-                setState(() {
-                  print('$item');
-                });
-              },
-            ),
           ],
         ),
       ),

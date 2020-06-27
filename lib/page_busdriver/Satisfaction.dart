@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gradient_app_bar/gradient_app_bar.dart';
 
 class SatisfactionPage extends StatefulWidget{
   @override
