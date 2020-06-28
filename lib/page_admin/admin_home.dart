@@ -1,6 +1,7 @@
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/admin_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class AdminHome extends StatefulWidget {
   static List<AdminModel> adminModel = List<AdminModel>();
@@ -10,7 +11,14 @@ class AdminHome extends StatefulWidget {
 }
 
 class _AdminHomeState extends State<AdminHome> {
-  Size size;
+  List listSvg = [
+    "avatar",
+    "bus-stop",
+    "calendar",
+    "star",
+    "bus1",
+  ];
+
   List listText = [
     "ข้อมูลคนขับรถ",
     "จุดรับส่งผู้โดยสาร",
@@ -18,9 +26,9 @@ class _AdminHomeState extends State<AdminHome> {
     "ความคิดเห็น",
     "ตำแหน่งปัจจุบันของรถ",
   ];
-  List<Icon> listIcon = [
-    Icon(Icons.person),
-  ];
+
+  Size size;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,11 +56,68 @@ class _AdminHomeState extends State<AdminHome> {
         ),
       );
 
+  get grid {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        child: GridView.count(
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+          crossAxisCount: 2,
+          children: List.generate(listText.length, (int x) {
+            return Card(
+              elevation: 10,
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                side: BorderSide(color: Colors.white),
+              ),
+              child: InkWell(
+                onTap: () {
+                  print('object');
+                },
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image(
+                        image:
+                            Svg('asset/svg/' + listSvg[x] + '.svg', height: 60),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(bottom: 5, top: 10),
+                          child: (x == listText.length - 1)
+                              ? Container()
+                              : Text(
+                                  'จัดการ',
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 22,
+                                  ),
+                                )),
+                      Text(
+                        listText[x],
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+
   get header => ListTile(
         contentPadding: EdgeInsets.only(left: 20, right: 20, top: 30),
         title: Text(
-          'Dashboard',
-          style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 30),
+          'ผู้ดูแลระบบ',
+          style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 37),
         ),
         subtitle: Container(
           child: Row(
@@ -88,63 +153,6 @@ class _AdminHomeState extends State<AdminHome> {
           backgroundColor: Colors.white,
         ),
       );
-
-  get grid {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-        child: GridView.count(
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          crossAxisCount: 2,
-          children: List.generate(listText.length, (int x) {
-            return Card(
-              elevation: 10,
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                side: BorderSide(color: Colors.white),
-              ),
-              child: InkWell(
-                onTap: () {
-                  print('object');
-                },
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons1.access_alarms,
-                        size: 40,
-                        color: Colors.grey[800],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 5, top: 10),
-                        child: (x == listText.length-1) ? Container() : Text(
-                          'จัดการ',
-                          style: TextStyle(
-                            color: Colors.grey[800],
-                            fontSize: 22,
-                          ),
-                        ) 
-                      ),
-                      Text(
-                        listText[x],
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 22,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-        ),
-      ),
-    );
-  }
 }
 
 class ShapesPainter extends CustomPainter {
