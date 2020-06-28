@@ -1,7 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:adminapp/model/admin_model.dart';
+import 'package:adminapp/model/busdriver_model.dart';
+import 'package:adminapp/model/comment_model.dart';
 import 'package:adminapp/page_admin/admin_home.dart';
+import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/busdriver_home.dart';
+import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
@@ -35,6 +40,7 @@ class _LogingPageState extends State<LogingPage> {
   }
 
   Future loginAdmin() async {
+    var res;
     status['status'] = 'getProfile';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -45,6 +51,9 @@ class _LogingPageState extends State<LogingPage> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     print(response.body.toString());
     jsonData = json.decode(response.body);
+    AdminHome.adminModel = jsonData.map((i) => AdminModel.fromJson(i)).toList();
+    res = await getComment();
+    res = await getDataDriver();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -55,6 +64,7 @@ class _LogingPageState extends State<LogingPage> {
   }
 
   Future loginBusDriver() async {
+    var res;
     status['status'] = 'getProfile';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -66,6 +76,9 @@ class _LogingPageState extends State<LogingPage> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     print(response.body.toString());
     jsonData = json.decode(response.body);
+    BusdriverHome.busdriverModel =
+        jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    res = await getComment();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -73,6 +86,34 @@ class _LogingPageState extends State<LogingPage> {
       ),
     );
     _isLoading = false;
+  }
+
+  Future<Null> getComment() async {
+    status['status'] = 'show';
+    status['id'] = '';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/comment_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    CommentPage.comment =
+        jsonData.map((i) => CommentModel.fromJson(i)).toList();
+    return null;
+  }
+
+  Future<Null> getDataDriver() async {
+    status['status'] = 'show';
+    status['id'] = '';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    ManageDriver.busdriverList =
+        jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    return null;
   }
 
   ListView listviewInput() {

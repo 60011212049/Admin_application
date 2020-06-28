@@ -1,81 +1,92 @@
+import 'package:adminapp/custom_icons.dart';
+import 'package:adminapp/model/busdriver_model.dart';
 import 'package:flutter/material.dart';
 
 class ManageDriver extends StatefulWidget {
-  ManageDriver({Key key}) : super(key: key);
-
+  static List<BusdriverModel> busdriverList = List<BusdriverModel>();
   @override
   _ManageDriverState createState() => _ManageDriverState();
 }
 
 class _ManageDriverState extends State<ManageDriver> {
-  final GlobalKey _menuKey = new GlobalKey();
-  var _selection;
+  List<BusdriverModel> busdriverList = ManageDriver.busdriverList;
   @override
   Widget build(BuildContext context) {
-    final button = new PopupMenuButton(
-        key: _menuKey,
-        itemBuilder: (_) => <PopupMenuItem<String>>[
-              new PopupMenuItem<String>(
-                  child: const Text('Doge'), value: 'Doge'),
-              new PopupMenuItem<String>(
-                  child: const Text('Lion'), value: 'Lion'),
-            ],
-        onSelected: (_) {});
-
-    final tile = new ListTile(
-        title: new Text('Doge or lion?'),
-        trailing: button,
-        onTap: () {
-          // This is a hack because _PopupMenuButtonState is private.
-          dynamic state = _menuKey.currentState;
-          state.showButtonMenu();
-        });
-    return new Scaffold(
-      body: new Center(
-        child: popUpmenu,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('จัดการข้อมูลคนขับรถ'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(
+              Icons.add,
+              size: 30,
+            ),
+            onPressed: () {},
+          ),
+        ],
       ),
-    );
-  }
-
-  get popUpmenu {
-    return PopupMenuButton<String>(
-      onSelected: (String value) {
-        setState(() {
-          _selection = value;
-        });
-      },
-      child: ListTile(
-        leading: IconButton(
-          icon: Icon(Icons.add_alarm),
-          onPressed: () {
-            print('Hello world');
-          },
-        ),
-        title: Text('Title'),
-        subtitle: Column(
+      body: Container(
+        child: Column(
           children: <Widget>[
-            Text('Sub title'),
-            Text(_selection == null
-                ? 'Nothing selected yet'
-                : _selection.toString()),
+            Text(
+              'รายชื่อคนขับรถ',
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 31.0,
+              ),
+            ),
+            ListView.builder(
+              itemCount: busdriverList.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.grey[100],
+                      child: Icon(
+                        Icons1.person,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    title: Text(
+                      busdriverList[index].dName,
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 23.0,
+                      ),
+                    ),
+                    subtitle: Text(
+                      busdriverList[index].dTell,
+                      style: TextStyle(
+                        color: Colors.grey[800],
+                        fontSize: 13.0,
+                      ),
+                    ),
+                    trailing: Wrap(
+                      children: <Widget>[
+                        IconButton(
+                          icon: Icon(
+                            Icons1.edit,
+                            color: Colors.blue,
+                          ),
+                          onPressed: () {},
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons1.delete,
+                            color: Colors.red,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              shrinkWrap: true,
+            )
           ],
         ),
-        trailing: Icon(Icons.account_circle),
       ),
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        const PopupMenuItem<String>(
-          value: 'Value1',
-          child: Text('Choose value 1'),
-        ),
-        const PopupMenuItem<String>(
-          value: 'Value2',
-          child: Text('Choose value 2'),
-        ),
-        const PopupMenuItem<String>(
-          value: 'Value3',
-          child: Text('Choose value 3'),
-        ),
-      ],
     );
   }
 }
