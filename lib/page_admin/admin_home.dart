@@ -1,5 +1,7 @@
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/admin_model.dart';
+import 'package:adminapp/page/loginPage.dart';
+import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
@@ -28,6 +30,7 @@ class _AdminHomeState extends State<AdminHome> {
   ];
 
   Size size;
+  var _selection;
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +59,85 @@ class _AdminHomeState extends State<AdminHome> {
         ),
       );
 
+  get header => ListTile(
+        contentPadding: EdgeInsets.only(left: 20, right: 20, top: 30),
+        title: Text(
+          'ผู้ดูแลระบบ',
+          style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 37),
+        ),
+        subtitle: Container(
+          child: Row(
+            children: <Widget>[
+              InkWell(
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons1.directions_bus,
+                      size: 18,
+                    ),
+                    SizedBox(
+                      width: 2,
+                    ),
+                    Text(
+                      'Bus Tracking Project',
+                      style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 15),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        trailing: InkWell(
+          child: PopupMenuButton<String>(
+            onSelected: (String value) {
+              setState(() {
+                _selection = value;
+                if (value == 'Value1') {
+                } else if (value == 'Value2') {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LogingPage(),
+                    ),
+                  );
+                }
+              });
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'Value1',
+                child: ListTile(
+                  title: Text('แก้ไขข้อมูลโปรไฟล์'),
+                  trailing: Icon(Icons.edit),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Value2',
+                child: ListTile(
+                  title: Text('ออกจากระบบ'),
+                  trailing: Icon(Icons1.logout_2),
+                ),
+              ),
+            ],
+            child: CircleAvatar(
+              child: Icon(
+                Icons1.person,
+                color: Color(0xFF3a3a3a),
+              ),
+              backgroundColor: Colors.white,
+            ),
+          ),
+          onTap: () {
+            print('sdsd');
+          },
+        ),
+      );
+
   get grid {
     return Expanded(
       child: Container(
-        padding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        padding: EdgeInsets.only(left: 16, right: 16, bottom: 0),
         child: GridView.count(
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
@@ -74,7 +152,14 @@ class _AdminHomeState extends State<AdminHome> {
               ),
               child: InkWell(
                 onTap: () {
-                  print('object');
+                  print('object ');
+                  if (x == 0) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManageDriver(),
+                        ));
+                  }
                 },
                 child: Center(
                   child: Column(
@@ -112,47 +197,6 @@ class _AdminHomeState extends State<AdminHome> {
       ),
     );
   }
-
-  get header => ListTile(
-        contentPadding: EdgeInsets.only(left: 20, right: 20, top: 30),
-        title: Text(
-          'ผู้ดูแลระบบ',
-          style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 37),
-        ),
-        subtitle: Container(
-          child: Row(
-            children: <Widget>[
-              InkWell(
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      Icons.edit,
-                      size: 18,
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Text(
-                      'แก้ไขข้อมูลโปรไฟล์',
-                      style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 15),
-                    ),
-                  ],
-                ),
-                onTap: () {
-                  print('object');
-                },
-              ),
-            ],
-          ),
-        ),
-        trailing: CircleAvatar(
-          child: Icon(
-            Icons1.person,
-            color: Color(0xFF3a3a3a),
-          ),
-          backgroundColor: Colors.white,
-        ),
-      );
 }
 
 class ShapesPainter extends CustomPainter {
