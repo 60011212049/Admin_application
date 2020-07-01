@@ -60,7 +60,13 @@ class _CommentPageState extends State<CommentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ความคิดเห็น'),
+        title: Text(
+          'ความคิดเห็น',
+          textScaleFactor: 1.2,
+          style: TextStyle(
+            color: Color(0xFF3a3a3a),
+          ),
+        ),
       ),
       body: RefreshIndicator(
         child: ListView(

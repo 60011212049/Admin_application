@@ -10,7 +10,13 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('จัดการตารางการเดินรถ'),
+        title: Text(
+          'จัดการตารางการเดินรถ',
+          textScaleFactor: 1.2,
+          style: TextStyle(
+            color: Color(0xFF3a3a3a),
+          ),
+        ),
       ),
     );
   }

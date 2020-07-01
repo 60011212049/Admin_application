@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:adminapp/service/service.dart';
+import 'package:http/http.dart' as http;
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
+import 'package:adminapp/page_admin/add_driver.dart';
 import 'package:flutter/material.dart';
 
 class ManageDriver extends StatefulWidget {
@@ -9,19 +14,50 @@ class ManageDriver extends StatefulWidget {
 }
 
 class _ManageDriverState extends State<ManageDriver> {
+  var status = {};
   List<BusdriverModel> busdriverList = ManageDriver.busdriverList;
+
+  Future<Null> getDataDriver() async {
+    status['status'] = 'show';
+    status['id'] = '';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    ManageDriver.busdriverList =
+        jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    setState(() {
+      this.busdriverList = ManageDriver.busdriverList;
+    });
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('จัดการข้อมูลคนขับรถ'),
+        title: Text(
+          'จัดการข้อมูลคนขับรถ',
+          textScaleFactor: 1.2,
+          style: TextStyle(
+            color: Color(0xFF3a3a3a),
+          ),
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(
               Icons.add,
               size: 30,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddBusDriver(),
+                  )).then((value) => getDataDriver());
+            },
           ),
         ],
       ),
@@ -42,10 +78,15 @@ class _ManageDriverState extends State<ManageDriver> {
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundColor: Colors.grey[100],
-                      child: Icon(
-                        Icons1.person,
-                        color: Colors.grey[800],
-                      ),
+                      child: (busdriverList[index].dImage == '')
+                          ? Icon(
+                              Icons1.person,
+                              color: Colors.grey[800],
+                            )
+                          : Image.network('http://' +
+                              Service.ip +
+                              '/controlModel/images/member/' +
+                              busdriverList[index].dImage),
                     ),
                     title: Text(
                       busdriverList[index].dName,
