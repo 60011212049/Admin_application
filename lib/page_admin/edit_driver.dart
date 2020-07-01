@@ -7,16 +7,22 @@ import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
-import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:http_parser/http_parser.dart';
 
-class AddBusDriver extends StatefulWidget {
+class EditBusDriver extends StatefulWidget {
+  String x;
+  EditBusDriver(String did) {
+    this.x = did;
+  }
+
   @override
-  _AddBusDriverState createState() => _AddBusDriverState();
+  _EditBusDriverState createState() => _EditBusDriverState(x);
 }
 
-class _AddBusDriverState extends State<AddBusDriver> {
+class _EditBusDriverState extends State<EditBusDriver> {
   var status = {};
   var _usernamecontroller = TextEditingController();
   var _passwordcontroller = TextEditingController();
@@ -30,8 +36,48 @@ class _AddBusDriverState extends State<AddBusDriver> {
   var bit;
   bool show = true;
   int id;
+  String idPro;
   String radioButtonItem;
   DateTime _dataTime = DateTime.now();
+  List<BusdriverModel> busEdit = List<BusdriverModel>();
+
+  _EditBusDriverState(String x) {
+    this.idPro = x;
+    print('asdasd');
+    getDataDriver();
+  }
+
+  Future<Null> getDataDriver() async {
+    status['status'] = 'showId';
+    status['id'] = this.idPro;
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    busEdit = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    setState(() {
+      setText();
+    });
+    return null;
+  }
+
+  void setText() {
+    _usernamecontroller.text = busEdit[0].dUsername;
+    _passwordcontroller.text = busEdit[0].dPassword;
+    _emailcontroller.text = busEdit[0].dEmail;
+    _gendercontroller.text = busEdit[0].dSex;
+    if (_gendercontroller.text == 'male') {
+      this.id = 1;
+    } else {
+      this.id = 2;
+    }
+    _imagecontroller.text = busEdit[0].dImage;
+    _namecontroller.text = busEdit[0].dName;
+    _tellcontroller.text = busEdit[0].dTell;
+    _dataTime = DateTime.parse(busEdit[0].bdDate);
+  }
 
   Future<Map<String, dynamic>> _uploadImage() async {
     final mimeTypeData =
@@ -68,7 +114,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
   }
 
   Future<List<BusdriverModel>> _sentDataBusDriver() async {
-    status['status'] = 'add';
+    status['status'] = 'edit';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
     status['name'] = _namecontroller.text;
@@ -114,7 +160,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
     return Scaffold(
       appBar: AppBar(
           title: Text(
-        'เพิ่มข้อมูลคนขับรถ',
+        'แก้ไขข้อมูลคนขับรถ',
         textScaleFactor: 1.2,
         style: TextStyle(
           color: Color(0xFF3a3a3a),
@@ -151,17 +197,33 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                         ),
                                       ),
                                     )
-                                  : Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            5, 10, 5, 10),
-                                        child: CircleAvatar(
-                                          backgroundImage: ExactAssetImage(
-                                              'asset/icons/student.png'),
-                                          radius: 110,
-                                        ),
-                                      ),
-                                    ),
+                                  : (_imagecontroller.text != '')
+                                      ? Center(
+                                          child: ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                              maxWidth: 300,
+                                              maxHeight: 200,
+                                            ),
+                                            child: Image.network(
+                                              'http://' +
+                                                  Service.ip +
+                                                  '/controlModel/images/member/' +
+                                                  busEdit[0].dImage,
+                                              fit: BoxFit.fitWidth,
+                                            ),
+                                          ),
+                                        )
+                                      : Center(
+                                          child: Padding(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                5, 10, 5, 10),
+                                            child: CircleAvatar(
+                                              backgroundImage: ExactAssetImage(
+                                                  'asset/icons/student.png'),
+                                              radius: 110,
+                                            ),
+                                          ),
+                                        )
                             ],
                           ),
                         ],
@@ -338,6 +400,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                   Container(
                                     width: 12,
                                   ),
+                                  //(_gendercontroller.text == 'male') ?
                                   Text(
                                     'เพศ',
                                     style: TextStyle(
@@ -434,7 +497,11 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                   lastDate: DateTime(2030),
                                 ).then((value) {
                                   setState(() {
-                                    _dataTime = value;
+                                    if (value != null) {
+                                      _dataTime = value;
+                                    } else {
+                                      _dataTime = _dataTime;
+                                    }
                                   });
                                 });
                               },
@@ -451,11 +518,13 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                         width: 12,
                                       ),
                                       (_dataTime == null)
-                                          ? Text('วันเดือนปี',
+                                          ? Text(
+                                              'วันเดือนปี',
                                               style: TextStyle(
                                                 color: Colors.grey,
                                                 fontSize: 22,
-                                              ))
+                                              ),
+                                            )
                                           : Text(
                                               _dataTime.day.toString() +
                                                   '/' +
@@ -465,7 +534,8 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                               style: TextStyle(
                                                 color: Colors.grey[800],
                                                 fontSize: 22,
-                                              )),
+                                              ),
+                                            ),
                                     ],
                                   ),
                                 ),

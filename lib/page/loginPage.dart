@@ -52,14 +52,26 @@ class _LogingPageState extends State<LogingPage> {
     print(response.body.toString());
     jsonData = json.decode(response.body);
     AdminHome.adminModel = jsonData.map((i) => AdminModel.fromJson(i)).toList();
-    res = await getComment();
-    res = await getDataDriver();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AdminHome(),
-      ),
-    );
+    if (response.statusCode == 200) {
+      var datauser = json.decode(response.body);
+      if (datauser.length == 0) {
+        setState(() {
+          _isLoading = false;
+          Toast.show("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        });
+      } else {
+        res = await getComment();
+        res = await getDataDriver();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdminHome(),
+          ),
+        );
+      }
+    } else {}
+
     _isLoading = false;
   }
 
@@ -78,13 +90,25 @@ class _LogingPageState extends State<LogingPage> {
     jsonData = json.decode(response.body);
     BusdriverHome.busdriverModel =
         jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
-    res = await getComment();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BusdriverHome(),
-      ),
-    );
+    if (response.statusCode == 200) {
+      var datauser = json.decode(response.body);
+      if (datauser.length == 0) {
+        setState(() {
+          _isLoading = false;
+          Toast.show("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        });
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BusdriverHome(),
+          ),
+        );
+        res = getComment();
+      }
+    } else {}
+
     _isLoading = false;
   }
 
@@ -99,6 +123,7 @@ class _LogingPageState extends State<LogingPage> {
     List jsonData = json.decode(response.body);
     CommentPage.comment =
         jsonData.map((i) => CommentModel.fromJson(i)).toList();
+
     return null;
   }
 

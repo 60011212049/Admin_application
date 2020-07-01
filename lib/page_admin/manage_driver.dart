@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:http/http.dart' as http;
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/page_admin/add_driver.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 
 class ManageDriver extends StatefulWidget {
   static List<BusdriverModel> busdriverList = List<BusdriverModel>();
@@ -16,6 +18,12 @@ class ManageDriver extends StatefulWidget {
 class _ManageDriverState extends State<ManageDriver> {
   var status = {};
   List<BusdriverModel> busdriverList = ManageDriver.busdriverList;
+
+  @override
+  void initState() {
+    super.initState();
+    getDataDriver();
+  }
 
   Future<Null> getDataDriver() async {
     status['status'] = 'show';
@@ -28,9 +36,32 @@ class _ManageDriverState extends State<ManageDriver> {
     List jsonData = json.decode(response.body);
     ManageDriver.busdriverList =
         jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
-    setState(() {
-      this.busdriverList = ManageDriver.busdriverList;
-    });
+    this.busdriverList = ManageDriver.busdriverList;
+    setState(() {});
+    return null;
+  }
+
+  Future<Null> deleteDriver(String id) async {
+    status['status'] = 'delete';
+    status['id'] = id;
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    if (response.statusCode == 200) {
+      if (response.body.toString() == 'Bad') {
+        setState(() {
+          Toast.show("ลบข้อมูลไม่สำเร็จ", context,
+              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        });
+      } else {
+        getDataDriver();
+        setState(() {});
+      }
+    } else {
+      setState(() {});
+    }
     return null;
   }
 
@@ -109,14 +140,24 @@ class _ManageDriverState extends State<ManageDriver> {
                             Icons1.edit,
                             color: Colors.blue,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditBusDriver(busdriverList[index].did),
+                                )).then((value) => getDataDriver());
+                          },
                         ),
                         IconButton(
                           icon: Icon(
                             Icons1.delete,
                             color: Colors.red,
                           ),
-                          onPressed: () {},
+                          onPressed: () {
+                            deleteDriver(busdriverList[index].did);
+                            setState(() {});
+                          },
                         ),
                       ],
                     ),

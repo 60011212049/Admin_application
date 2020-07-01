@@ -82,7 +82,7 @@ class _AdminHomeState extends State<AdminHome> {
                       width: 2,
                     ),
                     Text(
-                      'Bus Tracking Project',
+                      'MSU BusTracking Project',
                       style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 15),
                     ),
                   ],

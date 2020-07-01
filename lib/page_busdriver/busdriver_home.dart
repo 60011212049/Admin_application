@@ -2,8 +2,10 @@ import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/page/loginPage.dart';
 import 'package:adminapp/page_admin/admin_home.dart';
+import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
+import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
@@ -96,6 +98,13 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               setState(() {
                 _selection = value;
                 if (value == 'Value1') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditBusDriver(busdriverModel[0].did),
+                    ),
+                  );
                 } else if (value == 'Value2') {
                   Navigator.pushReplacement(
                     context,
@@ -143,11 +152,23 @@ class _BusdriverHomeState extends State<BusdriverHome> {
       child: Column(
         children: <Widget>[
           Container(
+            width: 180,
             height: 180,
-            child: ClipOval(
-              child: Image.asset(
-                'asset/icons/userIcon.png',
-                fit: BoxFit.fill,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                fit: BoxFit.fitHeight,
+                image: (busdriverModel[0].dImage == '')
+                    ? Image.asset(
+                        'asset/icons/userIcon.png',
+                        fit: BoxFit.fill,
+                      )
+                    : NetworkImage(
+                        'http://' +
+                            Service.ip +
+                            '/controlModel/images/member/' +
+                            busdriverModel[0].dImage,
+                      ),
               ),
             ),
           ),
