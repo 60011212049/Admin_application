@@ -159,10 +159,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               image: DecorationImage(
                 fit: BoxFit.fitHeight,
                 image: (busdriverModel[0].dImage == '')
-                    ? Image.asset(
-                        'asset/icons/userIcon.png',
-                        fit: BoxFit.fill,
-                      )
+                    ? AssetImage('asset/icons/userIcon.png')
                     : NetworkImage(
                         'http://' +
                             Service.ip +
