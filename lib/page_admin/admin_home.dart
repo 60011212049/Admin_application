@@ -189,7 +189,7 @@ class _AdminHomeState extends State<AdminHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MyMapPage(),
+                          builder: (context) => MapPage(),
                         ));
                   }
                 },

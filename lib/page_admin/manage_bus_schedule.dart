@@ -204,39 +204,41 @@ class MapPageState extends State<MapPage> {
         position:
             LatLng(destinationLocation.latitude, destinationLocation.longitude),
         icon: destinationIcon));
-    setPolylines();
+    // setPolylines();
   }
 
-  void setPolylines() async {
-    print(currentLocation.latitude);
-    print(currentLocation.longitude);
-    print(destinationLocation.latitude);
-    print(destinationLocation.longitude);
-    print(googleAPIKey);
-    List<PointLatLng> result = await polylinePoints.getRouteBetweenCoordinates(
-        googleAPIKey,
-        currentLocation.latitude,
-        currentLocation.longitude,
-        destinationLocation.latitude,
-        destinationLocation.longitude);
-    if (result.isNotEmpty) {
-      result.forEach((PointLatLng point) {
-        polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
-      setState(() {
-        _polylines.add(Polyline(
-            width: 5, // set the width of the polylines
-            polylineId: PolylineId('poly'),
-            color: Color.fromARGB(255, 40, 122, 198),
-            points: polylineCoordinates));
-      });
-    }
-  }
+  // void setPolylines() async {
+  //   print(currentLocation.latitude);
+  //   print(currentLocation.longitude);
+  //   print(destinationLocation.latitude);
+  //   print(destinationLocation.longitude);
+  //   print(googleAPIKey);
+  //   List<PointLatLng> result = await polylinePoints.getRouteBetweenCoordinates(
+  //       googleAPIKey,
+  //       currentLocation.latitude,
+  //       currentLocation.longitude,
+  //       destinationLocation.latitude,
+  //       destinationLocation.longitude);
+  //   if (result.isNotEmpty) {
+  //     result.forEach((PointLatLng point) {
+  //       polylineCoordinates.add(LatLng(point.latitude, point.longitude));
+  //     });
+  //     setState(() {
+  //       _polylines.add(Polyline(
+  //           width: 5, // set the width of the polylines
+  //           polylineId: PolylineId('poly'),
+  //           color: Color.fromARGB(255, 40, 122, 198),
+  //           points: polylineCoordinates));
+  //     });
+  //   }
+  // }
 
   void updatePinOnMap() async {
+    print(currentLocation.latitude.toString() +
+        ' ' +
+        currentLocation.longitude.toString());
     CameraPosition cPosition = CameraPosition(
       zoom: CAMERA_ZOOM,
-      tilt: CAMERA_TILT,
       bearing: CAMERA_BEARING,
       target: LatLng(currentLocation.latitude, currentLocation.longitude),
     );
@@ -256,10 +258,7 @@ class MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     CameraPosition initialCameraPosition = CameraPosition(
-        zoom: CAMERA_ZOOM,
-        tilt: CAMERA_TILT,
-        bearing: CAMERA_BEARING,
-        target: SOURCE_LOCATION);
+        zoom: CAMERA_ZOOM, bearing: CAMERA_BEARING, target: SOURCE_LOCATION);
     if (currentLocation != null) {
       initialCameraPosition = CameraPosition(
           target: LatLng(currentLocation.latitude, currentLocation.longitude),
