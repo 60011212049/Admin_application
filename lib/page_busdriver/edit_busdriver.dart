@@ -14,9 +14,9 @@ import 'package:http/http.dart' as http;
 
 import 'package:http_parser/http_parser.dart';
 
-class EditBusDriver extends StatefulWidget {
+class BusDriverEdit extends StatefulWidget {
   String x;
-  EditBusDriver(String did) {
+  BusDriverEdit(String did) {
     this.x = did;
   }
 
@@ -24,7 +24,7 @@ class EditBusDriver extends StatefulWidget {
   _EditBusDriverState createState() => _EditBusDriverState(x);
 }
 
-class _EditBusDriverState extends State<EditBusDriver> {
+class _EditBusDriverState extends State<BusDriverEdit> {
   var status = {};
   var _usernamecontroller = TextEditingController();
   var _passwordcontroller = TextEditingController();
@@ -96,11 +96,6 @@ class _EditBusDriverState extends State<EditBusDriver> {
     _tellcontroller.text = busEdit[0].dTell;
     _dataTime = busEdit[0].bdDate;
     _buscontroller.text = busEdit[0].cId;
-    if (_buscontroller.text.length == 9) {
-      _value = _buscontroller.text.substring(8);
-    } else {
-      _value = _buscontroller.text;
-    }
   }
 
   Future<Map<String, dynamic>> _uploadImage() async {
@@ -604,9 +599,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                 ),
                                 color: Colors.white),
                             child: InkWell(
-                              onTap: () {
-                                _askUser();
-                              },
+                              onTap: () {},
                               child: Center(
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 11),
@@ -620,7 +613,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                         width: 12,
                                       ),
                                       Text(
-                                        'รถรางคันที่ ' + _value,
+                                        'รถรางคันที่ ' + _buscontroller.text,
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 22.0,
@@ -676,101 +669,6 @@ class _EditBusDriverState extends State<EditBusDriver> {
         ),
       ),
     );
-  }
-
-  String _value = '';
-
-  void _setValue(String value) {
-    setState(() {
-      _buscontroller.text = 'msubus00' + value;
-      _value = value;
-    });
-  }
-
-  Future _askUser() async {
-    switch (await showDialog(
-        context: context,
-        child: new SimpleDialog(
-          title: new Text('กรุณาเลือกรถราง'),
-          children: <Widget>[
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 1'),
-              onPressed: () {
-                Navigator.pop(context, '1');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 2'),
-              onPressed: () {
-                Navigator.pop(context, '2');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 3'),
-              onPressed: () {
-                Navigator.pop(context, '3');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 4'),
-              onPressed: () {
-                Navigator.pop(context, '4');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 5'),
-              onPressed: () {
-                Navigator.pop(context, '5');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 6'),
-              onPressed: () {
-                Navigator.pop(context, '6');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 7'),
-              onPressed: () {
-                Navigator.pop(context, '7');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 8'),
-              onPressed: () {
-                Navigator.pop(context, '8');
-              },
-            ),
-          ],
-        ))) {
-      case '1':
-        _setValue('1');
-        break;
-      case '2':
-        _setValue('2');
-        break;
-      case '3':
-        _setValue('3');
-        break;
-      case '4':
-        _setValue('4');
-        break;
-      case '5':
-        _setValue('5');
-        break;
-      case '6':
-        _setValue('6');
-        break;
-      case '7':
-        _setValue('7');
-        break;
-      case '8':
-        _setValue('8');
-        break;
-      case '':
-        _setValue('');
-        break;
-    }
   }
 
   Text textSize(String tex) => new Text(

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/page/loginPage.dart';
@@ -5,9 +8,12 @@ import 'package:adminapp/page_admin/admin_home.dart';
 import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
+import 'package:adminapp/page_busdriver/edit_busdriver.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
+import 'package:location/location.dart';
+import 'package:http/http.dart' as http;
 
 class BusdriverHome extends StatefulWidget {
   static List<BusdriverModel> busdriverModel = List<BusdriverModel>();
@@ -30,6 +36,40 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   Size size;
   var _selection;
   bool checkWork = false;
+  Location location;
+  LocationData currentLocation;
+  @override
+  void initState() {
+    super.initState();
+    location = new Location();
+    location.onLocationChanged.listen((LocationData cLoc) {
+      currentLocation = cLoc;
+      if (checkWork == true) {
+        updateLocation();
+      }
+    });
+  }
+
+  Future<Null> getDataDriver() async {
+    var status = {};
+    status['status'] = 'showId';
+    status['id'] = busdriverModel[0].did;
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    busdriverModel = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    setState(() {});
+    return null;
+  }
+
+  void updateLocation() async {
+    print(currentLocation.latitude.toString() +
+        ' ' +
+        currentLocation.longitude.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,9 +142,9 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     context,
                     MaterialPageRoute(
                       builder: (context) =>
-                          EditBusDriver(busdriverModel[0].did),
+                          BusDriverEdit(busdriverModel[0].did),
                     ),
-                  );
+                  ).then((value) => getDataDriver());
                 } else if (value == 'Value2') {
                   Navigator.pushReplacement(
                     context,
@@ -191,7 +231,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                 Icon(Icons1.directions_bus),
                 Text('  :  '),
                 Text(
-                  'bus',
+                  busdriverModel[0].cId,
                   style: TextStyle(fontSize: 17),
                 ),
               ],
