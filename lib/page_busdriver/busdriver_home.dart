@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
+import 'package:adminapp/model/busposition_model.dart';
 import 'package:adminapp/page/loginPage.dart';
 import 'package:adminapp/page_admin/admin_home.dart';
 import 'package:adminapp/page_admin/edit_driver.dart';
@@ -33,11 +35,13 @@ class _BusdriverHomeState extends State<BusdriverHome> {
     "ตาราการทำงาน",
   ];
   List<BusdriverModel> busdriverModel = BusdriverHome.busdriverModel;
+  List<BusPositionModel> busPos = List<BusPositionModel>();
   Size size;
   var _selection;
   bool checkWork = false;
   Location location;
   LocationData currentLocation;
+  DateTime _dataTime = DateTime.now();
   @override
   void initState() {
     super.initState();
@@ -69,6 +73,24 @@ class _BusdriverHomeState extends State<BusdriverHome> {
     print(currentLocation.latitude.toString() +
         ' ' +
         currentLocation.longitude.toString());
+    var status = {};
+    status['status'] = 'update';
+    status['Cid'] = busdriverModel[0].cId;
+    status['longitude'] = currentLocation.longitude.toString();
+    status['latitude'] = currentLocation.latitude.toString();
+    status['date'] = DateTime.now().toString();
+    status['time'] = TimeOfDay.now().hour.toString() +
+        ':' +
+        TimeOfDay.now().minute.toString() +
+        ':00';
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busposition_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    print(response.body);
+    setState(() {});
   }
 
   @override
