@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:adminapp/model/admin_model.dart';
 import 'package:adminapp/model/busdriver_model.dart';
+import 'package:adminapp/model/busstop_model.dart';
 import 'package:adminapp/model/comment_model.dart';
 import 'package:adminapp/page_admin/admin_home.dart';
+import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/busdriver_home.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
@@ -49,7 +51,7 @@ class _LogingPageState extends State<LogingPage> {
         'http://' + Service.ip + '/controlModel/admin_model.php',
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    print(response.body.toString());
+
     jsonData = json.decode(response.body);
     AdminHome.adminModel = jsonData.map((i) => AdminModel.fromJson(i)).toList();
     if (response.statusCode == 200) {
@@ -63,6 +65,7 @@ class _LogingPageState extends State<LogingPage> {
       } else {
         res = await getComment();
         res = await getDataDriver();
+        res = await getBusstop();
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -71,7 +74,6 @@ class _LogingPageState extends State<LogingPage> {
         );
       }
     } else {}
-
     _isLoading = false;
   }
 
@@ -123,7 +125,20 @@ class _LogingPageState extends State<LogingPage> {
     List jsonData = json.decode(response.body);
     CommentPage.comment =
         jsonData.map((i) => CommentModel.fromJson(i)).toList();
+    return null;
+  }
 
+  Future<Null> getBusstop() async {
+    status['status'] = 'show';
+    status['id'] = '';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busstop_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    ManageBusstop.busstop =
+        jsonData.map((i) => BusstopModel.fromJson(i)).toList();
     return null;
   }
 

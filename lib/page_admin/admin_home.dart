@@ -5,7 +5,6 @@ import 'package:adminapp/page_admin/manage_bus_schedule.dart';
 import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_comment.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
-import 'package:adminapp/page_admin/testMap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
