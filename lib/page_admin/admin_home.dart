@@ -5,6 +5,7 @@ import 'package:adminapp/page_admin/manage_bus_schedule.dart';
 import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_comment.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
+import 'package:adminapp/page_admin/manage_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
@@ -17,15 +18,17 @@ class AdminHome extends StatefulWidget {
 
 class _AdminHomeState extends State<AdminHome> {
   List listSvg = [
-    "avatar",
-    "bus-stop",
+    "taxi-driver",
+    "boy",
+    "bus-stop1",
     "calendar",
-    "star",
+    "star2",
     "bus1",
   ];
 
   List listText = [
     "ข้อมูลคนขับรถ",
+    "ข้อมูลผู้ใช้งาน",
     "จุดรับส่งผู้โดยสาร",
     "ตารางการเดินรถ",
     "ความคิดเห็น",
@@ -167,56 +170,71 @@ class _AdminHomeState extends State<AdminHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusstop(),
+                          builder: (context) => ManageUser(),
                         ));
                   }
                   if (x == 2) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusSchedule(),
+                          builder: (context) => ManageBusstop(),
                         ));
                   }
                   if (x == 3) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CommentPageAdmin(),
+                          builder: (context) => ManageBusSchedule(),
                         ));
                   }
                   if (x == 4) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MapPage(),
+                          builder: (context) => CommentPageAdmin(),
                         ));
+                  }
+                  if (x == 5) {
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => MapPage(),
+                    //     ));
                   }
                 },
                 child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image(
-                        image:
-                            Svg('asset/svg/' + listSvg[x] + '.svg', height: 60),
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.only(bottom: 5, top: 10),
-                          child: (x == listText.length - 1)
-                              ? Container()
-                              : Text(
-                                  'จัดการ',
-                                  style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontSize: 22,
-                                  ),
-                                )),
-                      Text(
-                        listText[x],
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 22,
-                        ),
+                  child: Wrap(
+                    children: <Widget>[
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            height: 60,
+                            child: Image(
+                              image: AssetImage(
+                                  'asset/icons/' + listSvg[x] + '.png'),
+                            ),
+                          ),
+                          Padding(
+                              padding:
+                                  const EdgeInsets.only(bottom: 5, top: 10),
+                              child: (x == listText.length - 1)
+                                  ? Container()
+                                  : Text(
+                                      'จัดการ',
+                                      style: TextStyle(
+                                        color: Colors.grey[800],
+                                        fontSize: 22,
+                                      ),
+                                    )),
+                          Text(
+                            listText[x],
+                            style: TextStyle(
+                              color: Colors.grey[800],
+                              fontSize: 22,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

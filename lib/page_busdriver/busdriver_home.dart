@@ -42,16 +42,35 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   Location location;
   LocationData currentLocation;
   DateTime _dataTime = DateTime.now();
+
+  Timer timer;
   @override
   void initState() {
     super.initState();
-    location = new Location();
-    location.onLocationChanged.listen((LocationData cLoc) {
-      currentLocation = cLoc;
-      if (checkWork == true) {
+    // location = new Location();
+    // location.onLocationChanged.listen((LocationData cLoc) {
+    //   currentLocation = cLoc;
+    //   if (checkWork == true) {
+    //     updateLocation();
+    //   }
+    // });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  Future<Null> sentLocation() async {
+    if (checkWork == true) {
+      timer = Timer.periodic(Duration(seconds: 1), (timer) {
+        print('Timer : ' + timer.tick.toString());
         updateLocation();
-      }
-    });
+      });
+    } else {
+      timer?.cancel();
+    }
   }
 
   Future<Null> getDataDriver() async {
@@ -284,7 +303,9 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     color: Colors.red,
                     onPressed: () {
                       checkWork = true;
-                      setState(() {});
+                      setState(() {
+                        sentLocation();
+                      });
                     },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40.0),
@@ -315,7 +336,9 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     color: Colors.green,
                     onPressed: () {
                       checkWork = false;
-                      setState(() {});
+                      setState(() {
+                        sentLocation();
+                      });
                     },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40.0),
