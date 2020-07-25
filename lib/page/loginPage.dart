@@ -10,6 +10,7 @@ import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/busdriver_home.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -334,6 +335,8 @@ class _LogingPageState extends State<LogingPage> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(context,
+        width: 1080, height: 1920, allowFontScaling: false);
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(

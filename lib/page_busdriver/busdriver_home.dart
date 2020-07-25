@@ -89,6 +89,8 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   }
 
   void updateLocation() async {
+    Location location = Location();
+    currentLocation = await location.getLocation();
     print(currentLocation.latitude.toString() +
         ' ' +
         currentLocation.longitude.toString());

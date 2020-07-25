@@ -43,6 +43,7 @@ dependencies:
   intl: ^0.16.1
   google_map_polyline:
   permission:
+  flutter_screenutil: ^2.3.0
 
 dev_dependencies:
   flutter_test:

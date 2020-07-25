@@ -7,6 +7,7 @@ import 'package:adminapp/page_admin/manage_comment.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_admin/manage_user.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class AdminHome extends StatefulWidget {
@@ -209,7 +210,7 @@ class _AdminHomeState extends State<AdminHome> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            height: 60,
+                            height: ScreenUtil().setHeight(160),
                             child: Image(
                               image: AssetImage(
                                   'asset/icons/' + listSvg[x] + '.png'),
@@ -224,14 +225,16 @@ class _AdminHomeState extends State<AdminHome> {
                                       'จัดการ',
                                       style: TextStyle(
                                         color: Colors.grey[800],
-                                        fontSize: 22,
+                                        fontSize: ScreenUtil().setSp(57,
+                                            allowFontScalingSelf: true),
                                       ),
                                     )),
                           Text(
                             listText[x],
                             style: TextStyle(
                               color: Colors.grey[800],
-                              fontSize: 22,
+                              fontSize: ScreenUtil()
+                                  .setSp(57, allowFontScalingSelf: true),
                             ),
                           ),
                         ],
