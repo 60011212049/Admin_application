@@ -1,6 +1,7 @@
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/admin_model.dart';
 import 'package:adminapp/page/loginPage.dart';
+import 'package:adminapp/page_admin/manage_bus.dart';
 import 'package:adminapp/page_admin/manage_bus_schedule.dart';
 import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_comment.dart';
@@ -8,7 +9,6 @@ import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_admin/manage_user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 class AdminHome extends StatefulWidget {
   static List<AdminModel> adminModel = List<AdminModel>();
@@ -21,15 +21,17 @@ class _AdminHomeState extends State<AdminHome> {
   List listSvg = [
     "taxi-driver",
     "boy",
-    "bus-stop1",
+    "bus1",
+    "pointer",
     "calendar",
     "star2",
-    "bus1",
+    "bus-stop1",
   ];
 
   List listText = [
     "ข้อมูลคนขับรถ",
     "ข้อมูลผู้ใช้งาน",
+    "ข้อมูลรถ",
     "จุดรับส่งผู้โดยสาร",
     "ตารางการเดินรถ",
     "ความคิดเห็น",
@@ -178,24 +180,31 @@ class _AdminHomeState extends State<AdminHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusstop(),
+                          builder: (context) => ManageBus(),
                         ));
                   }
                   if (x == 3) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusSchedule(),
+                          builder: (context) => ManageBusstop(),
                         ));
                   }
                   if (x == 4) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CommentPageAdmin(),
+                          builder: (context) => ManageBusSchedule(),
                         ));
                   }
                   if (x == 5) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CommentPageAdmin(),
+                        ));
+                  }
+                  if (x == 6) {
                     // Navigator.push(
                     //     context,
                     //     MaterialPageRoute(

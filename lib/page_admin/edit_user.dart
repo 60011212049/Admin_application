@@ -301,9 +301,10 @@ class EditUserState extends State<EditUser> {
                                       style: TextStyle(
                                           fontSize: 22.0, height: 1.0),
                                       decoration: InputDecoration(
+                                        labelText: 'ชื่อ นามสกุล',
                                         filled: true,
                                         fillColor: Colors.white,
-                                        hintText: name,
+                                        hintText: 'ชื่อ นามสกุล',
                                         hintStyle: TextStyle(
                                           color: Colors.grey,
                                           fontSize: 22.0,
@@ -323,6 +324,7 @@ class EditUserState extends State<EditUser> {
                                       style: TextStyle(
                                           fontSize: 22.0, height: 1.0),
                                       decoration: InputDecoration(
+                                        labelText: 'ชื่อผู้ใช้งาน',
                                         filled: true,
                                         fillColor: Colors.white,
                                         hintText: 'ชื่อผู้ใช้งาน',
@@ -346,6 +348,7 @@ class EditUserState extends State<EditUser> {
                                       style: TextStyle(
                                           fontSize: 22.0, height: 1.0),
                                       decoration: InputDecoration(
+                                        labelText: 'รหัสผ่าน',
                                         filled: true,
                                         fillColor: Colors.white,
                                         hintText: 'รหัสผ่าน',
@@ -369,6 +372,7 @@ class EditUserState extends State<EditUser> {
                                       style: TextStyle(
                                           fontSize: 22.0, height: 1.0),
                                       decoration: InputDecoration(
+                                        labelText: 'อีเมล์',
                                         filled: true,
                                         fillColor: Colors.white,
                                         hintText: 'อีเมล์',
