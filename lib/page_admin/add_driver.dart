@@ -434,7 +434,9 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                   lastDate: DateTime(2030),
                                 ).then((value) {
                                   setState(() {
-                                    _dataTime = value;
+                                    if (value != null) {
+                                      _dataTime = value;
+                                    }
                                   });
                                 });
                               },

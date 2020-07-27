@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
@@ -17,7 +18,10 @@ class ManageDriver extends StatefulWidget {
 
 class _ManageDriverState extends State<ManageDriver> {
   var status = {};
-  List<BusdriverModel> busdriverList = ManageDriver.busdriverList;
+  List<BusdriverModel> busdriverList = List<BusdriverModel>();
+  List<BusdriverModel> driverForSearch = List<BusdriverModel>();
+
+  TextEditingController editcontroller = TextEditingController();
 
   @override
   void initState() {
@@ -26,6 +30,7 @@ class _ManageDriverState extends State<ManageDriver> {
   }
 
   Future<Null> getDataDriver() async {
+    driverForSearch.clear();
     status['status'] = 'show';
     status['id'] = '';
     String jsonSt = json.encode(status);
@@ -34,9 +39,9 @@ class _ManageDriverState extends State<ManageDriver> {
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
-    ManageDriver.busdriverList =
-        jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
-    this.busdriverList = ManageDriver.busdriverList;
+    busdriverList = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    driverForSearch.addAll(busdriverList);
+    filterSearchResults(editcontroller.text);
     setState(() {});
     return null;
   }
@@ -65,15 +70,38 @@ class _ManageDriverState extends State<ManageDriver> {
     return null;
   }
 
+  void filterSearchResults(String query) {
+    List<BusdriverModel> dummySearchList = List<BusdriverModel>();
+    dummySearchList.addAll(busdriverList);
+    if (query.isNotEmpty) {
+      List<BusdriverModel> dummyListData = List<BusdriverModel>();
+      dummySearchList.forEach((item) {
+        if ((item.dName.toLowerCase()).contains(query)) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        driverForSearch.clear();
+        driverForSearch.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        driverForSearch.clear();
+        driverForSearch.addAll(busdriverList);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'จัดการข้อมูลคนขับรถ',
-          textScaleFactor: 1.2,
           style: TextStyle(
             color: Color(0xFF3a3a3a),
+            fontSize: ScreenUtil().setSp(60),
           ),
         ),
         actions: <Widget>[
@@ -102,69 +130,86 @@ class _ManageDriverState extends State<ManageDriver> {
                 fontSize: 31.0,
               ),
             ),
-            ListView.builder(
-              itemCount: busdriverList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Card(
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.grey[100],
-                      child: (busdriverList[index].dImage == '')
-                          ? Icon(
-                              Icons1.person,
-                              color: Colors.grey[800],
-                            )
-                          : Image.network('http://' +
-                              Service.ip +
-                              '/controlModel/images/member/' +
-                              busdriverList[index].dImage),
-                    ),
-                    title: Text(
-                      busdriverList[index].dName,
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontSize: 23.0,
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: TextField(
+                onChanged: (value) {
+                  filterSearchResults(value);
+                },
+                controller: editcontroller,
+                decoration: InputDecoration(
+                    labelText: "ค้นหาจากชื่อ",
+                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: driverForSearch.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.grey[100],
+                        child: (driverForSearch[index].dImage == '')
+                            ? Icon(
+                                Icons1.person,
+                                color: Colors.grey[800],
+                              )
+                            : Image.network('http://' +
+                                Service.ip +
+                                '/controlModel/images/member/' +
+                                driverForSearch[index].dImage),
+                      ),
+                      title: Text(
+                        driverForSearch[index].dName,
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 23.0,
+                        ),
+                      ),
+                      subtitle: Text(
+                        driverForSearch[index].dTell,
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 13.0,
+                        ),
+                      ),
+                      trailing: Wrap(
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(
+                              Icons1.edit,
+                              color: Colors.blue,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditBusDriver(
+                                        driverForSearch[index].did),
+                                  )).then((value) => getDataDriver());
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons1.delete,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              deleteDriver(driverForSearch[index].did);
+                              setState(() {});
+                            },
+                          ),
+                        ],
                       ),
                     ),
-                    subtitle: Text(
-                      busdriverList[index].dTell,
-                      style: TextStyle(
-                        color: Colors.grey[800],
-                        fontSize: 13.0,
-                      ),
-                    ),
-                    trailing: Wrap(
-                      children: <Widget>[
-                        IconButton(
-                          icon: Icon(
-                            Icons1.edit,
-                            color: Colors.blue,
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditBusDriver(busdriverList[index].did),
-                                )).then((value) => getDataDriver());
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons1.delete,
-                            color: Colors.red,
-                          ),
-                          onPressed: () {
-                            deleteDriver(busdriverList[index].did);
-                            setState(() {});
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-              shrinkWrap: true,
+                  );
+                },
+                shrinkWrap: true,
+              ),
             )
           ],
         ),

@@ -2,58 +2,37 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/custom_icons.dart';
-import 'package:adminapp/model/busstop_model.dart';
 import 'package:adminapp/service/service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:mime/mime.dart';
-import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:http_parser/http_parser.dart';
+import 'package:toast/toast.dart';
 
-// ignore: must_be_immutable
-class EditBusstop extends StatefulWidget {
-  BusstopModel x;
-  EditBusstop(BusstopModel did) {
-    this.x = did;
-  }
-
+class AddBusstop extends StatefulWidget {
   @override
-  _EditBusstopState createState() => _EditBusstopState(x);
+  _AddBusstopState createState() => _AddBusstopState();
 }
 
-class _EditBusstopState extends State<EditBusstop> {
+class _AddBusstopState extends State<AddBusstop> {
   var status = {};
   var _namecontroller = TextEditingController();
   var _imagecontroller = TextEditingController();
   var _latitudecontroller = TextEditingController();
   var _longitudecontroller = TextEditingController();
-  File image;
-  var bit;
+
   Location location = Location();
   LocationData locatNow;
-  BusstopModel busstop;
+  File image;
+  var bit;
 
-  _EditBusstopState(BusstopModel x) {
-    this.busstop = x;
-  }
   @override
   void initState() {
     super.initState();
-    setState(() {
-      setText();
-    });
-  }
-
-  void setText() {
-    _namecontroller.text = busstop.sName;
-    _latitudecontroller.text = busstop.sLongitude;
-    _longitudecontroller.text = busstop.sLatitude;
-    _imagecontroller.text = busstop.sImage;
   }
 
   Future<Map<String, dynamic>> _uploadImage() async {
@@ -70,13 +49,11 @@ class _EditBusstopState extends State<EditBusstop> {
       final streamedResponse = await imageUploadRequest.send();
       final response = await http.Response.fromStream(streamedResponse);
       if (response.statusCode != 200) {
-        Toast.show("ไม่สามารถแก้ไขข้อมูลได้", context,
+        Toast.show("ไม่สามารถเพิ่มรูปภาพได้", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         return null;
       } else {
         var res = await _sentDataBusstop();
-        Toast.show("เพิ่มข้อมูลสำเร็จ", context,
-            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
       final Map<String, dynamic> responseData = json.decode(response.body);
       return responseData;
@@ -87,8 +64,7 @@ class _EditBusstopState extends State<EditBusstop> {
   }
 
   Future<void> _sentDataBusstop() async {
-    status['status'] = 'edit';
-    status['id'] = busstop.sid;
+    status['status'] = 'add';
     status['name'] = _namecontroller.text;
     status['latitude'] = _latitudecontroller.text;
     status['longitude'] = _longitudecontroller.text;
@@ -105,17 +81,20 @@ class _EditBusstopState extends State<EditBusstop> {
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
         setState(() {
-          Toast.show("ไม่แก้ไขข้อมูลได้", context,
+          Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
-        Toast.show("แก้ไขข้อมูลสำเร็จ", context,
+        Toast.show("เพิ่มข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         bit = '';
         Navigator.pop(context);
       }
     } else {
-      setState(() {});
+      setState(() {
+        Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+      });
     }
   }
 
@@ -159,33 +138,17 @@ class _EditBusstopState extends State<EditBusstop> {
                                       ),
                                     ),
                                   )
-                                : (_imagecontroller.text != '')
-                                    ? Center(
-                                        child: ConstrainedBox(
-                                          constraints: BoxConstraints(
-                                            maxWidth: 300,
-                                            maxHeight: 200,
-                                          ),
-                                          child: Image.network(
-                                            'http://' +
-                                                Service.ip +
-                                                '/controlModel/images/member/' +
-                                                busstop.sImage,
-                                            fit: BoxFit.fitWidth,
-                                          ),
-                                        ),
-                                      )
-                                    : Center(
-                                        child: Padding(
-                                          padding: const EdgeInsets.fromLTRB(
-                                              5, 10, 5, 10),
-                                          child: Container(
-                                            child: Image.asset(
-                                                'asset/icons/bus-stop1.png'),
-                                            height: ScreenUtil().setHeight(530),
-                                          ),
-                                        ),
-                                      )
+                                : Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          5, 10, 5, 10),
+                                      child: Container(
+                                        child: Image.asset(
+                                            'asset/icons/bus-stop1.png'),
+                                        height: ScreenUtil().setHeight(530),
+                                      ),
+                                    ),
+                                  )
                           ],
                         ),
                       ],

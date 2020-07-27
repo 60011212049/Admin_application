@@ -1,6 +1,7 @@
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/admin_model.dart';
 import 'package:adminapp/page/loginPage.dart';
+import 'package:adminapp/page_admin/bus_location.dart';
 import 'package:adminapp/page_admin/manage_bus.dart';
 import 'package:adminapp/page_admin/manage_bus_schedule.dart';
 import 'package:adminapp/page_admin/manage_busstop.dart';
@@ -205,11 +206,11 @@ class _AdminHomeState extends State<AdminHome> {
                         ));
                   }
                   if (x == 6) {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => MapPage(),
-                    //     ));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BusLocation(),
+                        ));
                   }
                 },
                 child: Center(

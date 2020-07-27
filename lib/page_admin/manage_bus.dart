@@ -20,6 +20,8 @@ class ManageBus extends StatefulWidget {
 class _ManageBusState extends State<ManageBus> {
   List<BusModel> listBus = List<BusModel>();
   List<BusdriverModel> listDriver = List<BusdriverModel>();
+  List<BusModel> listBusSearch = List<BusModel>();
+  TextEditingController editcontroller = TextEditingController();
   bool loadData = false;
   var status = {};
   String text = '2';
@@ -32,16 +34,18 @@ class _ManageBusState extends State<ManageBus> {
   }
 
   Future<Null> getDataBus() async {
+    listBusSearch.clear();
     status['status'] = 'show';
     status['id'] = '';
     String jsonSt = json.encode(status);
-
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/bus_model.php',
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     listBus = jsonData.map((i) => BusModel.fromJson(i)).toList();
+    listBusSearch.addAll(listBus);
+    filterSearchResults(editcontroller.text);
     setState(() {
       loadData = true;
     });
@@ -91,6 +95,32 @@ class _ManageBusState extends State<ManageBus> {
     }
   }
 
+  void filterSearchResults(String query) {
+    List<BusModel> dummySearchListBus = List<BusModel>();
+    List<BusdriverModel> dummySearchListDriver = List<BusdriverModel>();
+    dummySearchListBus.addAll(listBus);
+    dummySearchListDriver.addAll(listDriver);
+    if (query.isNotEmpty) {
+      List<BusModel> dummyListDataBus = List<BusModel>();
+      List<BusdriverModel> dummyListDataDriver = List<BusdriverModel>();
+      dummySearchListBus.forEach((item) {
+        if ((item.cid.toLowerCase()).contains(query)) {
+          dummyListDataBus.add(item);
+        }
+      });
+      setState(() {
+        listBusSearch.clear();
+        listBusSearch.addAll(dummyListDataBus);
+      });
+      return;
+    } else {
+      setState(() {
+        listBusSearch.clear();
+        listBusSearch.addAll(listBus);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,68 +152,91 @@ class _ManageBusState extends State<ManageBus> {
         ],
       ),
       body: Container(
-        child: ListView.builder(
-          itemCount: listBus.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              child: ListTile(
-                title: Text(
-                  listBus[index].cid,
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontSize: ScreenUtil().setSp(55),
-                  ),
-                ),
-                subtitle: listDriver.length == 0
-                    ? Text(
-                        '',
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: ScreenUtil().setSp(35),
-                        ),
-                      )
-                    : Text(
-                        'ชื่อคนขับ : ' +
-                            checkDriver(listDriver, listBus[index].did),
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: ScreenUtil().setSp(40),
-                        ),
-                      ),
-                trailing: Wrap(
-                  children: <Widget>[
-                    IconButton(
-                      icon: Icon(
-                        Icons1.edit,
-                        color: Colors.blue,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => EditBus(listBus[index].cid),
-                            )).then((value) {
-                          getDataBus();
-                          getDataDriver();
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons1.delete,
-                        color: Colors.red,
-                      ),
-                      onPressed: () {
-                        deleteBus(listBus[index].cid);
-                        setState(() {});
-                      },
-                    ),
-                  ],
-                ),
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: TextField(
+                onChanged: (value) {
+                  filterSearchResults(value);
+                },
+                controller: editcontroller,
+                decoration: InputDecoration(
+                    labelText: "ค้นหาจากชื่อ",
+                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
               ),
-            );
-          },
-          shrinkWrap: true,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: listBusSearch.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(
+                        listBusSearch[index].cid,
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: ScreenUtil().setSp(55),
+                        ),
+                      ),
+                      subtitle: listDriver.length == 0
+                          ? Text(
+                              '',
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontSize: ScreenUtil().setSp(35),
+                              ),
+                            )
+                          : Text(
+                              'ชื่อคนขับ : ' +
+                                  checkDriver(
+                                      listDriver, listBusSearch[index].did),
+                              style: TextStyle(
+                                color: Colors.grey[800],
+                                fontSize: ScreenUtil().setSp(40),
+                              ),
+                            ),
+                      trailing: Wrap(
+                        children: <Widget>[
+                          IconButton(
+                            icon: Icon(
+                              Icons1.edit,
+                              color: Colors.blue,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditBus(listBusSearch[index].cid),
+                                  )).then((value) {
+                                getDataBus();
+                                getDataDriver();
+                              });
+                            },
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons1.delete,
+                              color: Colors.red,
+                            ),
+                            onPressed: () {
+                              deleteBus(listBusSearch[index].cid);
+                              setState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                shrinkWrap: true,
+              ),
+            ),
+          ],
         ),
       ),
     );

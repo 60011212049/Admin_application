@@ -6,6 +6,7 @@ import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
 
 class CommentPageAdmin extends StatefulWidget {
@@ -27,22 +28,16 @@ class _CommentPageState extends State<CommentPageAdmin> {
     double x = 0;
     for (var i = 0; i < comment.length; i++) {
       rat = rat + double.parse(comment[i].rPoint.toString());
-      print('> ' + comment[i].rPoint.toString());
       x = x + 1;
     }
-    print('number > ' + rat.toString());
     rat = double.parse((rat / x).toStringAsFixed(1));
-    print('Sum : ' + rat.toString() + ' i : ' + x.toString());
   }
 
   Future<Null> refreshList() async {
-    //await Future.delayed(Duration(seconds: 2));
-    print('Refresh list');
     var status = {};
     status['status'] = 'show';
     status['id'] = '';
     String jsonSt = json.encode(status);
-    print(jsonSt);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/comment_model.php',
         body: jsonSt,
@@ -62,9 +57,9 @@ class _CommentPageState extends State<CommentPageAdmin> {
       appBar: AppBar(
         title: Text(
           'ความคิดเห็น',
-          textScaleFactor: 1.2,
           style: TextStyle(
             color: Color(0xFF3a3a3a),
+            fontSize: ScreenUtil().setSp(60),
           ),
         ),
       ),

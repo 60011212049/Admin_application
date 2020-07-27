@@ -44,6 +44,8 @@ dependencies:
   google_map_polyline:
   permission:
   flutter_screenutil: ^2.3.0
+  day_night_time_picker:
+    
 
 dev_dependencies:
   flutter_test:

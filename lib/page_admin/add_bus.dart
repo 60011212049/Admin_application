@@ -40,18 +40,24 @@ class _AddBusState extends State<AddBus> {
     if (tx >= 99 && tx <= 999) {
       tx = tx + 1;
       namecontroller.text =
-          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 4) +
+          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 2) +
               tx.toString();
     } else if (tx >= 9 && tx <= 99) {
       tx = tx + 1;
       namecontroller.text =
-          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 3) +
+          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 1) +
               tx.toString();
     } else if (tx < 9) {
       tx = tx + 1;
-      namecontroller.text =
-          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 2) +
-              tx.toString();
+      if (tx == 9) {
+        namecontroller.text =
+            (listBus[listBus.length - 1].cid).substring(0, listBus.length) +
+                tx.toString();
+      } else {
+        namecontroller.text =
+            (listBus[listBus.length - 1].cid).substring(0, listBus.length - 1) +
+                tx.toString();
+      }
     }
     setState(() {
       loadData = true;

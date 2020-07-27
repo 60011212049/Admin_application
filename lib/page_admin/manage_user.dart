@@ -7,6 +7,7 @@ import 'package:adminapp/page_admin/add_user.dart';
 import 'package:adminapp/page_admin/edit_user.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
 
@@ -18,6 +19,8 @@ class ManageUser extends StatefulWidget {
 class _ManageUserState extends State<ManageUser> {
   var status = {};
   List<MemberModel> memberList = List<MemberModel>();
+  List<MemberModel> memForSearch = List<MemberModel>();
+  TextEditingController editcontroller = TextEditingController();
   bool loadData = false;
 
   @override
@@ -27,6 +30,7 @@ class _ManageUserState extends State<ManageUser> {
   }
 
   Future<Null> getDataMember() async {
+    memForSearch.clear();
     status['status'] = 'show';
     status['id'] = '';
     String jsonSt = json.encode(status);
@@ -37,6 +41,8 @@ class _ManageUserState extends State<ManageUser> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     memberList = jsonData.map((i) => MemberModel.fromJson(i)).toList();
+    memForSearch.addAll(memberList);
+    filterSearchResults(editcontroller.text);
     setState(() {
       loadData = true;
     });
@@ -68,15 +74,38 @@ class _ManageUserState extends State<ManageUser> {
     }
   }
 
+  void filterSearchResults(String query) {
+    List<MemberModel> dummySearchList = List<MemberModel>();
+    dummySearchList.addAll(memberList);
+    if (query.isNotEmpty) {
+      List<MemberModel> dummyListData = List<MemberModel>();
+      dummySearchList.forEach((item) {
+        if ((item.mName.toLowerCase()).contains(query)) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        memForSearch.clear();
+        memForSearch.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        memForSearch.clear();
+        memForSearch.addAll(memberList);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'จัดการข้อมูลผู้ใช้งาน',
-          textScaleFactor: 1.2,
           style: TextStyle(
             color: Color(0xFF3a3a3a),
+            fontSize: ScreenUtil().setSp(60),
           ),
         ),
         actions: <Widget>[
@@ -108,19 +137,34 @@ class _ManageUserState extends State<ManageUser> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: TextField(
+                onChanged: (value) {
+                  filterSearchResults(value);
+                },
+                controller: editcontroller,
+                decoration: InputDecoration(
+                    labelText: "ค้นหาจากชื่อ",
+                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
             loadData == false
                 ? Center(
                     child: CircularProgressIndicator(),
                   )
-                : Container(
+                : Expanded(
                     child: ListView.builder(
-                      itemCount: memberList.length,
+                      itemCount: memForSearch.length,
                       itemBuilder: (BuildContext context, int index) {
                         return Card(
                           child: ListTile(
                             leading: CircleAvatar(
                               backgroundColor: Colors.grey[100],
-                              child: (memberList[index].mImage == '')
+                              child: (memForSearch[index].mImage == '')
                                   ? Icon(
                                       Icons1.person,
                                       color: Colors.grey[800],
@@ -128,17 +172,17 @@ class _ManageUserState extends State<ManageUser> {
                                   : Image.network('http://' +
                                       Service.ip +
                                       '/controlModel/images/member/' +
-                                      memberList[index].mImage),
+                                      memForSearch[index].mImage),
                             ),
                             title: Text(
-                              memberList[index].mName,
+                              memForSearch[index].mName,
                               style: TextStyle(
                                 color: Colors.grey[800],
                                 fontSize: 20.0,
                               ),
                             ),
                             subtitle: Text(
-                              memberList[index].mEmail,
+                              memForSearch[index].mEmail,
                               style: TextStyle(
                                 color: Colors.grey[800],
                                 fontSize: 13.0,
@@ -156,7 +200,7 @@ class _ManageUserState extends State<ManageUser> {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              EditUser(memberList[index].mid),
+                                              EditUser(memForSearch[index].mid),
                                         )).then((value) => getDataMember());
                                   },
                                 ),
@@ -166,7 +210,7 @@ class _ManageUserState extends State<ManageUser> {
                                     color: Colors.red,
                                   ),
                                   onPressed: () {
-                                    deleteDriver(memberList[index].mid);
+                                    deleteDriver(memForSearch[index].mid);
                                     setState(() {});
                                   },
                                 ),
