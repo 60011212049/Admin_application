@@ -29,6 +29,7 @@ class _BusLocationState extends State<BusLocation> {
   List<BusPositionModel> busPos = List<BusPositionModel>();
   Location location;
   bool checkWork = false;
+  bool chectState = false;
   Timer timer;
   Set<Polyline> lines = {};
   @override
@@ -46,6 +47,7 @@ class _BusLocationState extends State<BusLocation> {
 
   @override
   void dispose() {
+    chectState = true;
     timer?.cancel();
     super.dispose();
   }
@@ -92,7 +94,9 @@ class _BusLocationState extends State<BusLocation> {
         ),
       );
     }
-    updatePinOnMap();
+    if (chectState == false) {
+      updatePinOnMap();
+    }
   }
 
   void updatePinOnMap() async {

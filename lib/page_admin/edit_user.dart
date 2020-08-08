@@ -189,7 +189,7 @@ class EditUserState extends State<EditUser> {
                                                   child: Image.network(
                                                     'http://' +
                                                         Service.ip +
-                                                        '/controlModel/images/member/' +
+                                                        '/controlModel/showImage.php?name=' +
                                                         _imagecontroller.text,
                                                     fit: BoxFit.fitWidth,
                                                   ),

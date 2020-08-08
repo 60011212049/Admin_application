@@ -5,14 +5,17 @@ import 'dart:io';
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/model/busposition_model.dart';
+import 'package:adminapp/model/busstop_model.dart';
 import 'package:adminapp/page/loginPage.dart';
 import 'package:adminapp/page_admin/admin_home.dart';
 import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/page_busdriver/edit_busdriver.dart';
+import 'package:adminapp/page_busdriver/work_schedule.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -36,44 +39,63 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   ];
   List<BusdriverModel> busdriverModel = BusdriverHome.busdriverModel;
   List<BusPositionModel> busPos = List<BusPositionModel>();
+  List<BusstopModel> busstop = List<BusstopModel>();
   Size size;
   var _selection;
   bool checkWork = false;
-  Location location;
+  Location location = Location();
   LocationData currentLocation;
   DateTime _dataTime = DateTime.now();
-
+  StreamSubscription stream;
   Timer timer;
   @override
   void initState() {
     super.initState();
-    // location = new Location();
-    // location.onLocationChanged.listen((LocationData cLoc) {
-    //   currentLocation = cLoc;
+    stream = location.onLocationChanged.listen((event) {
+      print(event.latitude.toString() + ',' + event.longitude.toString());
+      if (checkWork == true) {
+        updateLocation();
+      } else {}
+    });
+    // location.onLocationChanged.listen((event) {
+    //   print(event.latitude.toString() + ',' + event.longitude.toString());
     //   if (checkWork == true) {
     //     updateLocation();
-    //   }
+    //   } else {}
     // });
   }
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
+    stream.cancel();
   }
 
-  Future<Null> sentLocation() async {
-    if (checkWork == true) {
-      timer = Timer.periodic(Duration(seconds: 1), (timer) {
-        print('Timer : ' + timer.tick.toString());
-        updateLocation();
-      });
-    } else {
-      timer?.cancel();
-    }
+  Future<Null> sentLocation() async {}
+  // Future<Null> sentLocation() async {
+  //   if (checkWork == true) {
+  //     timer = Timer.periodic(Duration(seconds: 1), (timer) {
+  //       print('Timer : ' + timer.tick.toString());
+  //       updateLocation();
+  //     });
+  //   } else {
+  //     timer?.cancel();
+  //   }
+  // }
+
+  Future getDataBusstop() async {
+    var status = {};
+    status['status'] = 'show';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busstop_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    busstop = jsonData.map((i) => BusstopModel.fromJson(i)).toList();
   }
 
-  Future<Null> getDataDriver() async {
+  Future getDataDriver() async {
     var status = {};
     status['status'] = 'showId';
     status['id'] = busdriverModel[0].did;
@@ -85,17 +107,30 @@ class _BusdriverHomeState extends State<BusdriverHome> {
     List jsonData = json.decode(response.body);
     busdriverModel = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
     setState(() {});
-    return null;
   }
 
   void updateLocation() async {
     Location location = Location();
     currentLocation = await location.getLocation();
-    print(currentLocation.latitude.toString() +
+    String sid = '1';
+    for (var i = 0; i < busstop.length; i++) {
+      var lat = double.parse(busstop[i].sLongitude);
+      var lng = double.parse(busstop[i].sLatitude);
+      if ((lat >= (currentLocation.latitude - 0.0006) &&
+              lat <= (currentLocation.latitude + 0.0006)) &&
+          (lng >= (currentLocation.longitude - 0.0006) &&
+              lng <= (currentLocation.longitude - 0.0006))) {
+        sid = busstop[i].sid;
+        print('Check point Sid : ' + sid);
+      }
+    }
+    print('update location ' +
+        currentLocation.latitude.toString() +
         ' ' +
         currentLocation.longitude.toString());
     var status = {};
     status['status'] = 'update';
+    status['sid'] = sid;
     status['Cid'] = busdriverModel[0].cId;
     status['longitude'] = currentLocation.longitude.toString();
     status['latitude'] = currentLocation.latitude.toString();
@@ -111,7 +146,6 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     print(response.body);
-    setState(() {});
   }
 
   @override
@@ -246,7 +280,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     : NetworkImage(
                         'http://' +
                             Service.ip +
-                            '/controlModel/images/member/' +
+                            '/controlModel/showImage.php?name=' +
                             busdriverModel[0].dImage,
                       ),
               ),
@@ -304,10 +338,10 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     ),
                     color: Colors.red,
                     onPressed: () {
-                      checkWork = true;
-                      setState(() {
-                        sentLocation();
-                      });
+                      showMyDialog();
+                      // setState(() {
+                      //   sentLocation();
+                      // });
                     },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40.0),
@@ -378,6 +412,14 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                         MaterialPageRoute(
                           builder: (context) => CommentPage(),
                         ));
+                  } else if (x == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            WorkSchedule(busdriverModel[0].cId),
+                      ),
+                    );
                   }
                 },
                 child: Center(
@@ -406,6 +448,62 @@ class _BusdriverHomeState extends State<BusdriverHome> {
           }),
         ),
       ),
+    );
+  }
+
+  showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          // title: Text('AlertDialog Title'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Center(
+                  child: Text(
+                    'เริ่มออกรถ',
+                    style: TextStyle(fontSize: ScreenUtil().setSp(80)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            Center(
+              child: Row(
+                children: <Widget>[
+                  FlatButton(
+                    child: Text(
+                      'ยืนยัน',
+                      style: TextStyle(fontSize: ScreenUtil().setSp(50)),
+                    ),
+                    onPressed: () {
+                      checkWork = true;
+                      setState(() {
+                        sentLocation();
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  Container(
+                    width: 20,
+                  ),
+                  FlatButton(
+                    child: Text(
+                      'ยกเลิก',
+                      style: TextStyle(fontSize: ScreenUtil().setSp(50)),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

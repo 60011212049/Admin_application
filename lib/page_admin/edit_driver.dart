@@ -137,7 +137,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
     }
   }
 
-  Future<List<BusdriverModel>> _sentDataBusDriver() async {
+  Future _sentDataBusDriver() async {
     status['status'] = 'edit';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -232,7 +232,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                             child: Image.network(
                                               'http://' +
                                                   Service.ip +
-                                                  '/controlModel/images/member/' +
+                                                  '/controlModel/showImage.php?name=' +
                                                   busEdit[0].dImage,
                                               fit: BoxFit.fitWidth,
                                             ),
@@ -341,6 +341,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                               child: TextField(
                                 style: TextStyle(fontSize: 22.0, height: 1.0),
                                 decoration: InputDecoration(
+                                  labelText: 'ชื่อผู้ใช้งาน',
                                   filled: true,
                                   fillColor: Colors.white,
                                   hintText: 'ชื่อผู้ใช้งาน',
@@ -363,6 +364,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'รหัสผ่าน',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'รหัสผ่าน',
@@ -385,6 +387,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'ชื่อ นามสกุล',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'ชื่อ นามสกุล',
@@ -485,6 +488,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'อีเมล์',
@@ -575,6 +579,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               maxLength: 10,
                               decoration: InputDecoration(
+                                labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'เบอร์โทร',

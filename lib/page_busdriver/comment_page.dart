@@ -8,18 +8,17 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
 
 class CommentPage extends StatefulWidget {
-  static List<CommentModel> comment = List<CommentModel>();
   @override
   _CommentPageState createState() => _CommentPageState();
 }
 
 class _CommentPageState extends State<CommentPage> {
   double rat = 0;
-  List<CommentModel> comment = CommentPage.comment;
+  List<CommentModel> comment = List<CommentModel>();
   @override
   void initState() {
     super.initState();
-    calRating();
+    refreshList();
   }
 
   void calRating() {

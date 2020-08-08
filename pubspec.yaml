@@ -45,7 +45,8 @@ dependencies:
   permission:
   flutter_screenutil: ^2.3.0
   day_night_time_picker:
-    
+  shared_preferences: ^0.5.8
+
 
 dev_dependencies:
   flutter_test:

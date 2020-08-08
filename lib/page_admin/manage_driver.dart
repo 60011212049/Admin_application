@@ -62,7 +62,8 @@ class _ManageDriverState extends State<ManageDriver> {
         });
       } else {
         getDataDriver();
-        setState(() {});
+        Toast.show("ลบข้อมูลสำเร็จ", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
     } else {
       setState(() {});
@@ -160,7 +161,7 @@ class _ManageDriverState extends State<ManageDriver> {
                               )
                             : Image.network('http://' +
                                 Service.ip +
-                                '/controlModel/images/member/' +
+                                '/controlModel/showImage.php?name=' +
                                 driverForSearch[index].dImage),
                       ),
                       title: Text(

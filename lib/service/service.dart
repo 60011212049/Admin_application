@@ -1,3 +1,3 @@
 class Service {
-  static const String ip = '192.168.1.2';
+  static const String ip = 'buspro.getenjoyment.net';
 }

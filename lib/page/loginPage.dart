@@ -13,6 +13,7 @@ import 'package:adminapp/service/service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class LogingPage extends StatefulWidget {
@@ -30,10 +31,35 @@ class _LogingPageState extends State<LogingPage> {
   bool _isLoading = false;
   var _passwordcontroller = TextEditingController();
   var _usernamecontroller = TextEditingController();
+  SharedPreferences logindata;
+  List<AdminModel> adminModel = List<AdminModel>();
 
   @override
   void initState() {
     super.initState();
+    checkLogin();
+  }
+
+  void checkLogin() async {
+    logindata = await SharedPreferences.getInstance();
+    var idToken = logindata.getInt('tokenId');
+    var typeToken = logindata.getString('tokenType');
+    print(idToken.toString() + ' ' + typeToken.toString());
+    if (idToken != null && typeToken.toString() == 'admin') {
+      Navigator.pushReplacement(
+        context,
+        new MaterialPageRoute(
+          builder: (context) => AdminHome(),
+        ),
+      );
+    } else if (idToken != null && typeToken.toString() == 'driver') {
+      Navigator.pushReplacement(
+        context,
+        new MaterialPageRoute(
+          builder: (context) => BusdriverHome(),
+        ),
+      );
+    } else {}
   }
 
   void _toggleVisibility() {
@@ -54,7 +80,7 @@ class _LogingPageState extends State<LogingPage> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
 
     jsonData = json.decode(response.body);
-    AdminHome.adminModel = jsonData.map((i) => AdminModel.fromJson(i)).toList();
+    adminModel = jsonData.map((i) => AdminModel.fromJson(i)).toList();
     if (response.statusCode == 200) {
       var datauser = json.decode(response.body);
       if (datauser.length == 0) {
@@ -64,9 +90,10 @@ class _LogingPageState extends State<LogingPage> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
-        res = await getComment();
         res = await getDataDriver();
         res = await getBusstop();
+        logindata.setInt('tokenId', 1);
+        logindata.setString('tokenType', 'admin');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -108,25 +135,10 @@ class _LogingPageState extends State<LogingPage> {
             builder: (context) => BusdriverHome(),
           ),
         );
-        res = getComment();
       }
     } else {}
 
     _isLoading = false;
-  }
-
-  Future<Null> getComment() async {
-    status['status'] = 'show';
-    status['id'] = '';
-    String jsonSt = json.encode(status);
-    var response = await http.post(
-        'http://' + Service.ip + '/controlModel/comment_model.php',
-        body: jsonSt,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    List jsonData = json.decode(response.body);
-    CommentPage.comment =
-        jsonData.map((i) => CommentModel.fromJson(i)).toList();
-    return null;
   }
 
   Future<Null> getBusstop() async {

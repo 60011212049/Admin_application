@@ -37,6 +37,7 @@ class _EditBusstopState extends State<EditBusstop> {
   Location location = Location();
   LocationData locatNow;
   BusstopModel busstop;
+  bool loadImage = false;
 
   _EditBusstopState(BusstopModel x) {
     this.busstop = x;
@@ -98,6 +99,7 @@ class _EditBusstopState extends State<EditBusstop> {
       status['image'] = bit;
     }
     String jsonSt = json.encode(status);
+    print(jsonSt);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/busstop_model.php',
         body: jsonSt,
@@ -105,7 +107,7 @@ class _EditBusstopState extends State<EditBusstop> {
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
         setState(() {
-          Toast.show("ไม่แก้ไขข้อมูลได้", context,
+          Toast.show("ไม่สามารถแก้ไขข้อมูลได้", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
@@ -115,7 +117,8 @@ class _EditBusstopState extends State<EditBusstop> {
         Navigator.pop(context);
       }
     } else {
-      setState(() {});
+      Toast.show("ไม่สามารถแก้ไขข้อมูลได้", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
     }
   }
 
@@ -169,8 +172,8 @@ class _EditBusstopState extends State<EditBusstop> {
                                           child: Image.network(
                                             'http://' +
                                                 Service.ip +
-                                                '/controlModel/images/member/' +
-                                                busstop.sImage,
+                                                '/controlModel/showImage.php?name=' +
+                                                _imagecontroller.text,
                                             fit: BoxFit.fitWidth,
                                           ),
                                         ),

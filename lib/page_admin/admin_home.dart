@@ -8,12 +8,12 @@ import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_comment.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_admin/manage_user.dart';
+import 'package:adminapp/page_admin/page_transcription.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AdminHome extends StatefulWidget {
-  static List<AdminModel> adminModel = List<AdminModel>();
-
   @override
   _AdminHomeState createState() => _AdminHomeState();
 }
@@ -21,21 +21,21 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   List listSvg = [
     "taxi-driver",
-    "boy",
     "bus1",
     "pointer",
     "calendar",
     "star2",
+    "history",
     "bus-stop1",
   ];
 
   List listText = [
     "ข้อมูลคนขับรถ",
-    "ข้อมูลผู้ใช้งาน",
     "ข้อมูลรถ",
     "จุดรับส่งผู้โดยสาร",
     "ตารางการเดินรถ",
     "ความคิดเห็น",
+    "ประวัติการใช้งาน",
     "ตำแหน่งปัจจุบันของรถ",
   ];
 
@@ -101,10 +101,14 @@ class _AdminHomeState extends State<AdminHome> {
         trailing: InkWell(
           child: PopupMenuButton<String>(
             onSelected: (String value) {
-              setState(() {
+              setState(() async {
                 _selection = value;
                 if (value == 'Value1') {
                 } else if (value == 'Value2') {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.remove('tokenId');
+                  prefs.remove('tokenType');
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
@@ -146,14 +150,14 @@ class _AdminHomeState extends State<AdminHome> {
 
   get grid {
     return Expanded(
-      child: Container(
-        padding: EdgeInsets.only(left: 16, right: 16, bottom: 0),
-        child: GridView.count(
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          crossAxisCount: 2,
-          children: List.generate(listText.length, (int x) {
-            return Card(
+      child: GridView.count(
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        crossAxisCount: 2,
+        children: List.generate(listText.length, (int x) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+            child: Card(
               elevation: 10,
               color: Colors.white,
               shape: RoundedRectangleBorder(
@@ -174,35 +178,35 @@ class _AdminHomeState extends State<AdminHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageUser(),
+                          builder: (context) => ManageBus(),
                         ));
                   }
                   if (x == 2) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBus(),
+                          builder: (context) => ManageBusstop(),
                         ));
                   }
                   if (x == 3) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusstop(),
+                          builder: (context) => ManageBusSchedule(),
                         ));
                   }
                   if (x == 4) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusSchedule(),
+                          builder: (context) => CommentPageAdmin(),
                         ));
                   }
                   if (x == 5) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CommentPageAdmin(),
+                          builder: (context) => Transcription(),
                         ));
                   }
                   if (x == 6) {
@@ -229,7 +233,7 @@ class _AdminHomeState extends State<AdminHome> {
                           Padding(
                               padding:
                                   const EdgeInsets.only(bottom: 5, top: 10),
-                              child: (x == listText.length - 1)
+                              child: (x >= listText.length - 2)
                                   ? Container()
                                   : Text(
                                       'จัดการ',
@@ -253,9 +257,9 @@ class _AdminHomeState extends State<AdminHome> {
                   ),
                 ),
               ),
-            );
-          }),
-        ),
+            ),
+          );
+        }),
       ),
     );
   }

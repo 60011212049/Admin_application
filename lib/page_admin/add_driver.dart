@@ -254,6 +254,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
                               child: TextField(
                                 style: TextStyle(fontSize: 22.0, height: 1.0),
                                 decoration: InputDecoration(
+                                  labelText: 'ชื่อผู้ใช้งาน',
                                   filled: true,
                                   fillColor: Colors.white,
                                   hintText: 'ชื่อผู้ใช้งาน',
@@ -276,6 +277,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'รหัสผ่าน',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'รหัสผ่าน',
@@ -298,6 +300,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'ชื่อ นามสกุล',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'ชื่อ นามสกุล',
@@ -397,6 +400,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'อีเมล์',
@@ -482,6 +486,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               maxLength: 10,
                               decoration: InputDecoration(
+                                labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'เบอร์โทร',

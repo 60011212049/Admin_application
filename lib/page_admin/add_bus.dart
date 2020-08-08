@@ -26,6 +26,15 @@ class _AddBusState extends State<AddBus> {
     getDataBus();
   }
 
+  Future<Null> getDataBusSchedule() async {
+    status['status'] = 'add';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
   Future<Null> getDataBus() async {
     status['status'] = 'show';
     status['id'] = '';

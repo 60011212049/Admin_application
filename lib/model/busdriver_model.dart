@@ -23,6 +23,7 @@ class BusdriverModel {
     this.dEmail,
     this.cId,
     this.dImage,
+    this.dStatus,
   });
 
   String did;
@@ -35,6 +36,7 @@ class BusdriverModel {
   String dEmail;
   String cId;
   String dImage;
+  String dStatus;
 
   factory BusdriverModel.fromJson(Map<String, dynamic> json) => BusdriverModel(
         did: json["Did"],
@@ -47,6 +49,7 @@ class BusdriverModel {
         dEmail: json["d_email"],
         cId: json["CId"],
         dImage: json["d_image"],
+        dStatus: json["d_status"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -61,5 +64,6 @@ class BusdriverModel {
         "d_email": dEmail,
         "CId": cId,
         "d_image": dImage,
+        "d_status": dStatus,
       };
 }
