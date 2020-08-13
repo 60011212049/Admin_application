@@ -33,6 +33,7 @@ class _LogingPageState extends State<LogingPage> {
   var _usernamecontroller = TextEditingController();
   SharedPreferences logindata;
   List<AdminModel> adminModel = List<AdminModel>();
+  List<BusdriverModel> busdriver = List<BusdriverModel>();
 
   @override
   void initState() {
@@ -90,7 +91,6 @@ class _LogingPageState extends State<LogingPage> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
-        res = await getDataDriver();
         res = await getBusstop();
         logindata.setInt('tokenId', 1);
         logindata.setString('tokenType', 'admin');
@@ -106,7 +106,6 @@ class _LogingPageState extends State<LogingPage> {
   }
 
   Future loginBusDriver() async {
-    var res;
     status['status'] = 'getProfile';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -118,8 +117,7 @@ class _LogingPageState extends State<LogingPage> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     print(response.body.toString());
     jsonData = json.decode(response.body);
-    BusdriverHome.busdriverModel =
-        jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    busdriver = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
     if (response.statusCode == 200) {
       var datauser = json.decode(response.body);
       if (datauser.length == 0) {
@@ -129,6 +127,8 @@ class _LogingPageState extends State<LogingPage> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
+        logindata.setInt('tokenId', int.parse(busdriver[0].did));
+        logindata.setString('tokenType', 'driver');
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -137,7 +137,6 @@ class _LogingPageState extends State<LogingPage> {
         );
       }
     } else {}
-
     _isLoading = false;
   }
 
@@ -152,20 +151,6 @@ class _LogingPageState extends State<LogingPage> {
     List jsonData = json.decode(response.body);
     ManageBusstop.busstop =
         jsonData.map((i) => BusstopModel.fromJson(i)).toList();
-    return null;
-  }
-
-  Future<Null> getDataDriver() async {
-    status['status'] = 'show';
-    status['id'] = '';
-    String jsonSt = json.encode(status);
-    var response = await http.post(
-        'http://' + Service.ip + '/controlModel/busdriver_model.php',
-        body: jsonSt,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    List jsonData = json.decode(response.body);
-    ManageDriver.busdriverList =
-        jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
     return null;
   }
 

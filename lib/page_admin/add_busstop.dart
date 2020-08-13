@@ -11,6 +11,7 @@ import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:http_parser/http_parser.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class AddBusstop extends StatefulWidget {
@@ -33,6 +34,19 @@ class _AddBusstopState extends State<AddBusstop> {
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'เพิ่มข้อมูลจุดรับส่ง ' + _namecontroller.text;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   Future<Map<String, dynamic>> _uploadImage() async {
@@ -87,6 +101,7 @@ class _AddBusstopState extends State<AddBusstop> {
       } else {
         Toast.show("เพิ่มข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        addTransciption();
         bit = '';
         Navigator.pop(context);
       }

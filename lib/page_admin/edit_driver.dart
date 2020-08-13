@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/bus_model.dart';
 import 'package:adminapp/model/busdriver_model.dart';
+import 'package:adminapp/model/transcription_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 
@@ -96,11 +98,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
     _tellcontroller.text = busEdit[0].dTell;
     _dataTime = busEdit[0].bdDate;
     _buscontroller.text = busEdit[0].cId;
-    if (_buscontroller.text.length == 9) {
-      _value = _buscontroller.text.substring(8);
-    } else {
-      _value = _buscontroller.text;
-    }
+    _value = _buscontroller.text;
   }
 
   Future<Map<String, dynamic>> _uploadImage() async {
@@ -137,6 +135,31 @@ class _EditBusDriverState extends State<EditBusDriver> {
     }
   }
 
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'แก้ไขข้อมูลคนขับไอดี ' + idPro;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
+  Future<Null> updateDataBus() async {
+    status['status'] = 'editByadmin';
+    status['cid'] = _value;
+    status['id'] = idPro;
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/bus_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    print(response.body);
+  }
+
   Future _sentDataBusDriver() async {
     status['status'] = 'edit';
     status['username'] = _usernamecontroller.text;
@@ -170,6 +193,8 @@ class _EditBusDriverState extends State<EditBusDriver> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
+        var res = await updateDataBus();
+        addTransciption();
         Toast.show("แก้ไขข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         bit = '';
@@ -625,7 +650,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                         width: 12,
                                       ),
                                       Text(
-                                        'รถรางคันที่ ' + _value,
+                                        'รถราง ' + _value,
                                         style: TextStyle(
                                           color: Colors.grey[700],
                                           fontSize: 22.0,
@@ -650,7 +675,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                             ),
                             color: Colors.blue[700],
                             child: Text(
-                              "ยืนยันการเพิ่มข้อมูล",
+                              "ยืนยันการแก้ไขข้อมูล",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 27.0,
@@ -687,94 +712,31 @@ class _EditBusDriverState extends State<EditBusDriver> {
 
   void _setValue(String value) {
     setState(() {
-      _buscontroller.text = 'msubus00' + value;
+      _buscontroller.text = value;
       _value = value;
     });
   }
 
   Future _askUser() async {
-    switch (await showDialog(
-        context: context,
-        child: new SimpleDialog(
-          title: new Text('กรุณาเลือกรถราง'),
-          children: <Widget>[
+    var result = await showDialog(
+      context: context,
+      child: new SimpleDialog(
+        title: new Text('กรุณาเลือกรถราง'),
+        children: <Widget>[
+          for (var i = 1; i <= bus.length; i++)
             SimpleDialogOption(
-              child: textSize('รถรางคันที่ 1'),
+              child: textSize('รถรางคันที่ ' + i.toString()),
               onPressed: () {
-                Navigator.pop(context, '1');
+                Navigator.pop(context, bus[i - 1].cid);
               },
             ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 2'),
-              onPressed: () {
-                Navigator.pop(context, '2');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 3'),
-              onPressed: () {
-                Navigator.pop(context, '3');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 4'),
-              onPressed: () {
-                Navigator.pop(context, '4');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 5'),
-              onPressed: () {
-                Navigator.pop(context, '5');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 6'),
-              onPressed: () {
-                Navigator.pop(context, '6');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 7'),
-              onPressed: () {
-                Navigator.pop(context, '7');
-              },
-            ),
-            SimpleDialogOption(
-              child: textSize('รถรางคันที่ 8'),
-              onPressed: () {
-                Navigator.pop(context, '8');
-              },
-            ),
-          ],
-        ))) {
-      case '1':
-        _setValue('1');
-        break;
-      case '2':
-        _setValue('2');
-        break;
-      case '3':
-        _setValue('3');
-        break;
-      case '4':
-        _setValue('4');
-        break;
-      case '5':
-        _setValue('5');
-        break;
-      case '6':
-        _setValue('6');
-        break;
-      case '7':
-        _setValue('7');
-        break;
-      case '8':
-        _setValue('8');
-        break;
-      case '':
-        _setValue('');
-        break;
+        ],
+      ),
+    );
+    if (result != null) {
+      _setValue(result);
+    } else {
+      _setValue('');
     }
   }
 

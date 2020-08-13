@@ -8,6 +8,7 @@ import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/page_admin/add_driver.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class ManageDriver extends StatefulWidget {
@@ -27,6 +28,19 @@ class _ManageDriverState extends State<ManageDriver> {
   void initState() {
     super.initState();
     getDataDriver();
+  }
+
+  Future<Null> addTransciption(String id) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'ลบข้อมูลคนขับไอดี ' + id;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   Future<Null> getDataDriver() async {
@@ -62,6 +76,7 @@ class _ManageDriverState extends State<ManageDriver> {
         });
       } else {
         getDataDriver();
+        addTransciption(id);
         Toast.show("ลบข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       }
@@ -77,7 +92,9 @@ class _ManageDriverState extends State<ManageDriver> {
     if (query.isNotEmpty) {
       List<BusdriverModel> dummyListData = List<BusdriverModel>();
       dummySearchList.forEach((item) {
-        if ((item.dName.toLowerCase()).contains(query)) {
+        if ((item.dName.toLowerCase()).contains(query) ||
+            (item.dEmail.toLowerCase()).contains(query) ||
+            (item.dTell.toLowerCase()).contains(query)) {
           dummyListData.add(item);
         }
       });
@@ -139,7 +156,7 @@ class _ManageDriverState extends State<ManageDriver> {
                 },
                 controller: editcontroller,
                 decoration: InputDecoration(
-                    labelText: "ค้นหาจากชื่อ",
+                    labelText: "ค้นหาจากชื่อ อีเมล์ เบอร์โทร",
                     labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(

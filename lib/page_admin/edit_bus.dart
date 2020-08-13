@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class EditBus extends StatefulWidget {
@@ -59,6 +60,19 @@ class _EditBusState extends State<EditBus> {
     return null;
   }
 
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'แก้ไขข้อมูลรถราง ' + namecontroller.text;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
   Future<Null> updateDataBus() async {
     status['status'] = 'edit';
     status['cid'] = namecontroller.text;
@@ -81,6 +95,7 @@ class _EditBusState extends State<EditBus> {
       } else {
         Toast.show("แก้ไขข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        addTransciption();
         Navigator.pop(context);
       }
     } else {

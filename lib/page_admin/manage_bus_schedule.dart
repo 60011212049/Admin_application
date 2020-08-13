@@ -9,6 +9,7 @@ import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class ManageBusSchedule extends StatefulWidget {
@@ -18,12 +19,40 @@ class ManageBusSchedule extends StatefulWidget {
 
 class _ManageBusScheduleState extends State<ManageBusSchedule> {
   List<BusscheduleModel> busSchedule = List<BusscheduleModel>();
+  List<BusscheduleModel> busScheduleForSearch = List<BusscheduleModel>();
+  TextEditingController editcontroller = TextEditingController();
   var status = {};
-
+  bool loading = false;
+  int i = 0;
   @override
   void initState() {
     super.initState();
+    this.i = 0;
     getDataBusSchedule();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    this.i = 0;
+  }
+
+  int countRound() {
+    i = i + 1;
+    return i;
+  }
+
+  Future<Null> addTransciption(String id) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'ลบข้อมูลตารางเดินรถไอดี ' + id;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   Future<Null> getDataBusSchedule() async {
@@ -37,6 +66,8 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     busSchedule = jsonData.map((i) => BusscheduleModel.fromJson(i)).toList();
+    busScheduleForSearch.addAll(busSchedule);
+    loading = true;
     setState(() {});
   }
 
@@ -58,10 +89,35 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
         Toast.show("ลบข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         getDataBusSchedule();
+        addTransciption(id);
         setState(() {});
       }
     } else {
       setState(() {});
+    }
+  }
+
+  void filterSearchResults(String query) {
+    List<BusscheduleModel> dummySearchList = List<BusscheduleModel>();
+    dummySearchList.addAll(busSchedule);
+    if (query.isNotEmpty) {
+      List<BusscheduleModel> dummyListData = List<BusscheduleModel>();
+      dummySearchList.forEach((item) {
+        if ((item.cid.toLowerCase()).contains(query) ||
+            (item.tcTime.toLowerCase()).contains(query)) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        busScheduleForSearch.clear();
+        busScheduleForSearch.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        busScheduleForSearch.clear();
+        busScheduleForSearch.addAll(busSchedule);
+      });
     }
   }
 
@@ -87,7 +143,10 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => AddBusSchedule(),
-                  )).then((value) => getDataBusSchedule());
+                  )).then((value) {
+                this.i = 0;
+                getDataBusSchedule();
+              });
             },
           ),
         ],
@@ -95,6 +154,22 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
       body: Container(
         child: ListView(
           children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+              child: TextField(
+                onChanged: (value) {
+                  this.i = 0;
+                  filterSearchResults(value);
+                },
+                controller: editcontroller,
+                decoration: InputDecoration(
+                    labelText: "ค้นหาจากชื่อและเวลา",
+                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
             Container(
               child: Center(
                 child: DataTable(
@@ -116,50 +191,133 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
                       label: textColumn(''),
                     ),
                   ],
-                  rows: busSchedule
-                      .map(
-                        (data) => DataRow(
-                          cells: [
-                            DataCell(textRow(data.tCid)),
-                            DataCell(textRow(data.tcTime)),
-                            DataCell(textRow(data.cid)),
-                            DataCell(
-                              Row(
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: Colors.blue,
-                                      size: ScreenUtil().setSp(60),
+                  rows: (loading == true)
+                      ? busScheduleForSearch
+                          .map(
+                            (data) => DataRow(
+                              cells: [
+                                DataCell(
+                                  Container(
+                                    width: ScreenUtil().setWidth(50),
+                                    child: Text(
+                                      countRound().toString(),
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(40),
+                                        fontFamily: 'Quark',
+                                      ),
                                     ),
-                                    onPressed: () {
-                                      Navigator.push(
+                                  ),
+                                ),
+                                DataCell(
+                                  Container(
+                                    width: ScreenUtil().setWidth(200),
+                                    child: Text(
+                                      data.tcTime,
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(42),
+                                        fontFamily: 'Quark',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Container(
+                                    width: ScreenUtil().setWidth(200),
+                                    child: Text(
+                                      data.cid,
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(40),
+                                        fontFamily: 'Quark',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Row(
+                                    children: <Widget>[
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.blue,
+                                          size: ScreenUtil().setSp(60),
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     EditBusSchedule(data),
-                                              ))
-                                          .then(
-                                              (value) => getDataBusSchedule());
-                                    },
+                                              )).then((value) {
+                                            getDataBusSchedule();
+                                            this.i = 0;
+                                          });
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                          size: ScreenUtil().setSp(60),
+                                        ),
+                                        onPressed: () {
+                                          deleteDriver(data.tCid);
+                                          this.i = 0;
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  IconButton(
-                                    icon: Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
-                                      size: ScreenUtil().setSp(60),
-                                    ),
-                                    onPressed: () {
-                                      deleteDriver(data.tCid);
-                                    },
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      )
-                      .toList(),
+                          )
+                          .toList()
+                      : [
+                          DataRow(
+                            cells: [
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(50),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(40),
+                                      fontFamily: 'Quark',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(200),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(42),
+                                      fontFamily: 'Quark',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(200),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(40),
+                                      fontFamily: 'Quark',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(200),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                 ),
               ),
             ),

@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/custom_icons.dart';
+import 'package:adminapp/model/bus_model.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:http_parser/http_parser.dart';
 
@@ -27,11 +29,31 @@ class _AddBusDriverState extends State<AddBusDriver> {
   var _gendercontroller = TextEditingController();
   var _tellcontroller = TextEditingController();
   File image;
+  String value = '';
   var bit;
   bool show = true;
   int id;
   String radioButtonItem;
   DateTime _dataTime = DateTime.now();
+  List<BusModel> bus = List<BusModel>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'เพิ่มข้อมูลคนขับ ' + _namecontroller.text;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
 
   Future<Map<String, dynamic>> _uploadImage() async {
     final mimeTypeData =
@@ -78,6 +100,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
       _gendercontroller.text = 'female';
     }
     status['sex'] = _gendercontroller.text;
+    status['busId'] = value;
     status['tell'] = _tellcontroller.text;
     status['email'] = _emailcontroller.text;
     status['date'] = _dataTime.toString();

@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/model/bus_model.dart';
+import 'package:adminapp/model/busposition_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class AddBus extends StatefulWidget {
@@ -26,11 +28,31 @@ class _AddBusState extends State<AddBus> {
     getDataBus();
   }
 
-  Future<Null> getDataBusSchedule() async {
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
     status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'เพิ่มข้อมูลรถราง ' + namecontroller.text;
+    status['time'] = DateTime.now().toString();
     String jsonSt = json.encode(status);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
+  Future<void> addBusPosition(String text) async {
+    var status = {};
+    status['status'] = 'add';
+    status['cid'] = text;
+    status['date'] = DateTime.now().toString();
+    status['time'] = TimeOfDay.now().hour.toString() +
+        ':' +
+        TimeOfDay.now().minute.toString() +
+        ':00';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busposition_model.php',
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
@@ -53,9 +75,12 @@ class _AddBusState extends State<AddBus> {
               tx.toString();
     } else if (tx >= 9 && tx <= 99) {
       tx = tx + 1;
-      namecontroller.text =
-          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 1) +
-              tx.toString();
+
+      print((listBus[listBus.length - 1].cid)
+          .substring(0, listBus[listBus.length - 1].cid.length - 2));
+      namecontroller.text = (listBus[listBus.length - 1].cid)
+              .substring(0, listBus[listBus.length - 1].cid.length - 2) +
+          tx.toString();
     } else if (tx < 9) {
       tx = tx + 1;
       if (tx == 9) {
@@ -90,17 +115,18 @@ class _AddBusState extends State<AddBus> {
     print(response.statusCode.toString() + ' ' + response.body.toString());
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
-        setState(() {
-          Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        });
+        Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         Toast.show("เพิ่มข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        addTransciption();
+        addBusPosition(namecontroller.text);
         Navigator.pop(context);
       }
     } else {
-      setState(() {});
+      Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
+          duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
     }
   }
 

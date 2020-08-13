@@ -78,17 +78,93 @@ class _WorkScheduleState extends State<WorkSchedule> {
                       label: textColumn('รถราง'),
                     ),
                   ],
-                  rows: busSchedule
-                      .map(
-                        (data) => DataRow(
-                          cells: [
-                            DataCell(textRow(data.tCid)),
-                            DataCell(textRow(data.tcTime)),
-                            DataCell(textRow(data.cid)),
-                          ],
-                        ),
-                      )
-                      .toList(),
+                  rows: (busSchedule.length != 0)
+                      ? busSchedule
+                          .map(
+                            (data) => DataRow(
+                              cells: [
+                                DataCell(
+                                  Container(
+                                    width: ScreenUtil().setWidth(50),
+                                    child: Text(
+                                      data.tCid,
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(40),
+                                        fontFamily: 'Quark',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Container(
+                                    width: ScreenUtil().setWidth(300),
+                                    child: Text(
+                                      data.tcTime,
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(42),
+                                        fontFamily: 'Quark',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                DataCell(
+                                  Container(
+                                    width: ScreenUtil().setWidth(250),
+                                    child: Text(
+                                      data.cid,
+                                      style: TextStyle(
+                                        fontSize: ScreenUtil().setSp(40),
+                                        fontFamily: 'Quark',
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                          .toList()
+                      : [
+                          DataRow(
+                            cells: [
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(50),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(40),
+                                      fontFamily: 'Quark',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(300),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(42),
+                                      fontFamily: 'Quark',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              DataCell(
+                                Container(
+                                  width: ScreenUtil().setWidth(250),
+                                  child: Text(
+                                    '',
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(40),
+                                      fontFamily: 'Quark',
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                 ),
               ),
             ),

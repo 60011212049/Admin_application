@@ -20,10 +20,10 @@ class _TranscriptionState extends State<Transcription> {
   @override
   void initState() {
     super.initState();
-    getDataBusSchedule();
+    getDataTransciption();
   }
 
-  Future<Null> getDataBusSchedule() async {
+  Future<Null> getDataTransciption() async {
     status['status'] = 'show';
     String jsonSt = json.encode(status);
     print(jsonSt);

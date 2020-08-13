@@ -132,7 +132,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
     }
   }
 
-  Future<List<BusdriverModel>> _sentDataBusDriver() async {
+  Future _sentDataBusDriver() async {
     status['status'] = 'edit';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -227,7 +227,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                             child: Image.network(
                                               'http://' +
                                                   Service.ip +
-                                                  '/controlModel/images/member/' +
+                                                  '/controlModel/showImage.php?name=' +
                                                   busEdit[0].dImage,
                                               fit: BoxFit.fitWidth,
                                             ),
@@ -336,6 +336,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                               child: TextField(
                                 style: TextStyle(fontSize: 22.0, height: 1.0),
                                 decoration: InputDecoration(
+                                  labelText: 'ชื่อผู้ใช้งาน',
                                   filled: true,
                                   fillColor: Colors.white,
                                   hintText: 'ชื่อผู้ใช้งาน',
@@ -349,6 +350,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                   ),
                                   prefixIcon: Icon(Icons1.user_5),
                                 ),
+                                readOnly: true,
                                 controller: _usernamecontroller,
                               ),
                             )),
@@ -358,6 +360,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'รหัสผ่าน',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'รหัสผ่าน',
@@ -380,6 +383,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'ชื่อ นามสกุล',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'ชื่อ นามสกุล',
@@ -392,6 +396,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                         Radius.circular(20.0))),
                                 prefixIcon: Icon(Icons.verified_user),
                               ),
+                              readOnly: true,
                               controller: _namecontroller,
                             ),
                           ),
@@ -433,12 +438,6 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                   Radio(
                                     value: 1,
                                     groupValue: id,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        radioButtonItem = 'คนขับรถ';
-                                        id = 1;
-                                      });
-                                    },
                                   ),
                                   Text(
                                     'ชาย',
@@ -452,12 +451,6 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                   Radio(
                                     value: 2,
                                     groupValue: id,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        radioButtonItem = 'ผู้ดูแลระบบ';
-                                        id = 2;
-                                      });
-                                    },
                                   ),
                                   Text(
                                     'หญิง',
@@ -480,6 +473,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               decoration: InputDecoration(
+                                labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'อีเมล์',
@@ -570,6 +564,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               maxLength: 10,
                               decoration: InputDecoration(
+                                labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
                                 hintText: 'เบอร์โทร',
@@ -586,46 +581,6 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey[600],
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                color: Colors.white),
-                            child: InkWell(
-                              onTap: () {},
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 11),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons1.directions_bus,
-                                        color: Colors.grey[500],
-                                      ),
-                                      Container(
-                                        width: 12,
-                                      ),
-                                      Text(
-                                        'รถรางคันที่ ' + _buscontroller.text,
-                                        style: TextStyle(
-                                          color: Colors.grey[700],
-                                          fontSize: 22.0,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                         SizedBox(
                           height: 10.0,
                         ),
@@ -638,7 +593,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                             ),
                             color: Colors.blue[700],
                             child: Text(
-                              "ยืนยันการเพิ่มข้อมูล",
+                              "ยืนยันการแก้ไขข้อมูล",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 27.0,

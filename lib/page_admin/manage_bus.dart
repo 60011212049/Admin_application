@@ -10,6 +10,7 @@ import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class ManageBus extends StatefulWidget {
@@ -31,6 +32,30 @@ class _ManageBusState extends State<ManageBus> {
     super.initState();
     getDataBus();
     getDataDriver();
+  }
+
+  Future<Null> addTransciption(String id) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'ลบข้อมูลรถรางไอดี ' + id;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
+  Future<void> deleteBusPosition(String text) async {
+    var status = {};
+    status['status'] = 'delete';
+    status['cid'] = text;
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busposition_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   Future<Null> getDataBus() async {
@@ -84,7 +109,8 @@ class _ManageBusState extends State<ManageBus> {
       } else if (response.body.toString() == 'Good') {
         Toast.show("ลบข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-
+        addTransciption(id);
+        deleteBusPosition(id);
         setState(() {
           getDataBus();
           getDataDriver();
@@ -225,7 +251,6 @@ class _ManageBusState extends State<ManageBus> {
                             ),
                             onPressed: () {
                               deleteBus(listBusSearch[index].cid);
-                              setState(() {});
                             },
                           ),
                         ],

@@ -9,6 +9,7 @@ import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class EditBusSchedule extends StatefulWidget {
@@ -51,6 +52,19 @@ class _EditBusScheduleState extends State<EditBusSchedule> {
     });
   }
 
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'แก้ไขตารางเดินรถที่ ' + busSchedule.tCid;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
   Future sentDataBusSchedule() async {
     status['status'] = 'edit';
     status['id'] = busSchedule.tCid;
@@ -67,17 +81,18 @@ class _EditBusScheduleState extends State<EditBusSchedule> {
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
         setState(() {
-          Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
+          Toast.show("ไม่สามารถแก้ไขข้อมูลได้", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
-        Toast.show("เพิ่มข้อมูลสำเร็จ", context,
+        Toast.show("แก้ไขข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        addTransciption();
         Navigator.pop(context);
       }
     } else {
       setState(() {
-        Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
+        Toast.show("ไม่สามารถแก้ไขเพิ่มข้อมูลได้", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       });
     }
@@ -101,7 +116,7 @@ class _EditBusScheduleState extends State<EditBusSchedule> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'เพิ่มตารางการเดินรถ',
+          'แก้ไขตารางการเดินรถ',
           style: TextStyle(
             color: Color(0xFF3a3a3a),
             fontSize: ScreenUtil().setSp(60),
@@ -249,7 +264,7 @@ class _EditBusScheduleState extends State<EditBusSchedule> {
                     ),
                     color: Colors.blue[700],
                     child: Text(
-                      "ยืนยันการเพิ่มข้อมูล",
+                      "ยืนยันการแก้ไขข้อมูล",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: ScreenUtil().setSp(70),

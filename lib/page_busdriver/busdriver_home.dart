@@ -19,10 +19,9 @@ import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BusdriverHome extends StatefulWidget {
-  static List<BusdriverModel> busdriverModel = List<BusdriverModel>();
-
   @override
   _BusdriverHomeState createState() => _BusdriverHomeState();
 }
@@ -37,32 +36,27 @@ class _BusdriverHomeState extends State<BusdriverHome> {
     "ความคิดเห็น",
     "ตาราการทำงาน",
   ];
-  List<BusdriverModel> busdriverModel = BusdriverHome.busdriverModel;
+  List<BusdriverModel> busdriverModel = List<BusdriverModel>();
   List<BusPositionModel> busPos = List<BusPositionModel>();
   List<BusstopModel> busstop = List<BusstopModel>();
-  Size size;
-  var _selection;
+
+  var selection;
   bool checkWork = false;
+  bool loading = false;
   Location location = Location();
   LocationData currentLocation;
-  DateTime _dataTime = DateTime.now();
   StreamSubscription stream;
   Timer timer;
   @override
   void initState() {
     super.initState();
+    getDataDriver();
     stream = location.onLocationChanged.listen((event) {
       print(event.latitude.toString() + ',' + event.longitude.toString());
       if (checkWork == true) {
         updateLocation();
       } else {}
     });
-    // location.onLocationChanged.listen((event) {
-    //   print(event.latitude.toString() + ',' + event.longitude.toString());
-    //   if (checkWork == true) {
-    //     updateLocation();
-    //   } else {}
-    // });
   }
 
   @override
@@ -70,18 +64,6 @@ class _BusdriverHomeState extends State<BusdriverHome> {
     super.dispose();
     stream.cancel();
   }
-
-  Future<Null> sentLocation() async {}
-  // Future<Null> sentLocation() async {
-  //   if (checkWork == true) {
-  //     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-  //       print('Timer : ' + timer.tick.toString());
-  //       updateLocation();
-  //     });
-  //   } else {
-  //     timer?.cancel();
-  //   }
-  // }
 
   Future getDataBusstop() async {
     var status = {};
@@ -93,12 +75,14 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     busstop = jsonData.map((i) => BusstopModel.fromJson(i)).toList();
+    setState(() {});
   }
 
   Future getDataDriver() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
     var status = {};
     status['status'] = 'showId';
-    status['id'] = busdriverModel[0].did;
+    status['id'] = pref.getInt('tokenId').toString();
     String jsonSt = json.encode(status);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/busdriver_model.php',
@@ -106,6 +90,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     busdriverModel = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    loading = true;
     setState(() {});
   }
 
@@ -211,26 +196,26 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         ),
         trailing: InkWell(
           child: PopupMenuButton<String>(
-            onSelected: (String value) {
-              setState(() {
-                _selection = value;
-                if (value == 'Value1') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          BusDriverEdit(busdriverModel[0].did),
-                    ),
-                  ).then((value) => getDataDriver());
-                } else if (value == 'Value2') {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LogingPage(),
-                    ),
-                  );
-                }
-              });
+            onSelected: (String value) async {
+              selection = value;
+              if (value == 'Value1') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BusDriverEdit(busdriverModel[0].did),
+                  ),
+                ).then((value) => getDataDriver());
+              } else if (value == 'Value2') {
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                pref.remove('tokenId');
+                pref.remove('tokenType');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LogingPage(),
+                  ),
+                );
+              }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
@@ -257,9 +242,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               backgroundColor: Colors.yellow[700],
             ),
           ),
-          onTap: () {
-            print('sdsd');
-          },
+          onTap: () {},
         ),
       );
 
@@ -275,14 +258,16 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.fitHeight,
-                image: (busdriverModel[0].dImage == '')
-                    ? AssetImage('asset/icons/userIcon.png')
-                    : NetworkImage(
-                        'http://' +
-                            Service.ip +
-                            '/controlModel/showImage.php?name=' +
-                            busdriverModel[0].dImage,
-                      ),
+                image: (loading == true)
+                    ? (busdriverModel[0].dImage == '')
+                        ? AssetImage('asset/icons/userIcon.png')
+                        : NetworkImage(
+                            'http://' +
+                                Service.ip +
+                                '/controlModel/showImage.php?name=' +
+                                busdriverModel[0].dImage,
+                          )
+                    : AssetImage('asset/icons/userIcon.png'),
               ),
             ),
           ),
@@ -293,10 +278,12 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               children: <Widget>[
                 Icon(Icons1.user_4),
                 Text('  :  '),
-                Text(
-                  busdriverModel[0].dName,
-                  style: TextStyle(fontSize: 17),
-                ),
+                (loading != true)
+                    ? Text('')
+                    : Text(
+                        busdriverModel[0].dName,
+                        style: TextStyle(fontSize: 17),
+                      ),
               ],
             ),
           ),
@@ -307,10 +294,12 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               children: <Widget>[
                 Icon(Icons1.directions_bus),
                 Text('  :  '),
-                Text(
-                  busdriverModel[0].cId,
-                  style: TextStyle(fontSize: 17),
-                ),
+                (loading != true)
+                    ? Text('')
+                    : Text(
+                        busdriverModel[0].cId,
+                        style: TextStyle(fontSize: 17),
+                      ),
               ],
             ),
           ),
@@ -372,9 +361,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     color: Colors.green,
                     onPressed: () {
                       checkWork = false;
-                      setState(() {
-                        sentLocation();
-                      });
+                      setState(() {});
                     },
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(40.0),
@@ -480,9 +467,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     ),
                     onPressed: () {
                       checkWork = true;
-                      setState(() {
-                        sentLocation();
-                      });
+                      setState(() {});
                       Navigator.of(context).pop();
                     },
                   ),

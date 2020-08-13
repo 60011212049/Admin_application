@@ -12,22 +12,26 @@ String busModelToJson(List<BusModel> data) =>
 
 class BusModel {
   BusModel({
+    this.cId,
     this.cid,
     this.did,
     this.cStatus,
   });
 
+  String cId;
   String cid;
   String did;
   String cStatus;
 
   factory BusModel.fromJson(Map<String, dynamic> json) => BusModel(
+        cId: json["c_id"],
         cid: json["Cid"],
         did: json["Did"],
         cStatus: json["c_status"],
       );
 
   Map<String, dynamic> toJson() => {
+        "c_id": cId,
         "Cid": cid,
         "Did": did,
         "c_status": cStatus,

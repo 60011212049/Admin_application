@@ -9,6 +9,7 @@ import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class ManageBusstop extends StatefulWidget {
@@ -28,6 +29,19 @@ class _ManageBusstopState extends State<ManageBusstop> {
   void initState() {
     super.initState();
     getBusstop();
+  }
+
+  Future<Null> addTransciption(String id) async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'ลบข้อมูลจุดรับส่งไอดี ' + id;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   Future<Null> getBusstop() async {
@@ -64,6 +78,7 @@ class _ManageBusstopState extends State<ManageBusstop> {
       } else {
         Toast.show("ลบข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        addTransciption(id);
         getBusstop();
         setState(() {});
       }

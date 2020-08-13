@@ -8,6 +8,7 @@ import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class AddBusSchedule extends StatefulWidget {
@@ -34,6 +35,19 @@ class _AddBusScheduleState extends State<AddBusSchedule> {
     });
   }
 
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'เพิ่มข้อมูลตารางเดินรถ ' + timecontroller.text;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
   Future sentDataBusSchedule() async {
     status['status'] = 'add';
     status['time'] =
@@ -55,6 +69,7 @@ class _AddBusScheduleState extends State<AddBusSchedule> {
       } else {
         Toast.show("เพิ่มข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        addTransciption();
         Navigator.pop(context);
       }
     } else {

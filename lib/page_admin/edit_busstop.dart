@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:mime/mime.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
 
@@ -55,6 +56,19 @@ class _EditBusstopState extends State<EditBusstop> {
     _latitudecontroller.text = busstop.sLongitude;
     _longitudecontroller.text = busstop.sLatitude;
     _imagecontroller.text = busstop.sImage;
+  }
+
+  Future<Null> addTransciption() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    status['status'] = 'add';
+    status['aid'] = pref.getInt('tokenId');
+    status['type'] = 'แก้ไขข้อมูลจุดรับส่ง ' + _namecontroller.text;
+    status['time'] = DateTime.now().toString();
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/transcription_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   Future<Map<String, dynamic>> _uploadImage() async {
@@ -114,6 +128,7 @@ class _EditBusstopState extends State<EditBusstop> {
         Toast.show("แก้ไขข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         bit = '';
+        addTransciption();
         Navigator.pop(context);
       }
     } else {
