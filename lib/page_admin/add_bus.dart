@@ -213,8 +213,8 @@ class _AddBusState extends State<AddBus> {
                   height: ScreenUtil().setHeight(12),
                 ),
                 ButtonTheme(
-                  minWidth: 250.0,
-                  height: ScreenUtil().setHeight(160),
+                  minWidth: ScreenUtil().setWidth(650),
+                  height: ScreenUtil().setHeight(170),
                   child: RaisedButton(
                     shape: new RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(23.0),

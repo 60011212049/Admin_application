@@ -256,8 +256,8 @@ class _EditBusScheduleState extends State<EditBusSchedule> {
                   height: ScreenUtil().setSp(30),
                 ),
                 ButtonTheme(
-                  minWidth: ScreenUtil().setWidth(660),
-                  height: ScreenUtil().setHeight(155),
+                  minWidth: ScreenUtil().setWidth(650),
+                  height: ScreenUtil().setHeight(170),
                   child: RaisedButton(
                     shape: new RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(23.0),

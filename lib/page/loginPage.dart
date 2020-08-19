@@ -70,7 +70,6 @@ class _LogingPageState extends State<LogingPage> {
   }
 
   Future loginAdmin() async {
-    var res;
     status['status'] = 'getProfile';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -91,8 +90,8 @@ class _LogingPageState extends State<LogingPage> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
-        res = await getBusstop();
-        logindata.setInt('tokenId', 1);
+        var res = await getBusstop();
+        logindata.setInt('tokenId', int.parse(adminModel[0].aid));
         logindata.setString('tokenType', 'admin');
         Navigator.pushReplacement(
           context,

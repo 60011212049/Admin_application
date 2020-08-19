@@ -8,6 +8,7 @@ import 'package:adminapp/model/transcription_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,8 +18,8 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 class EditBusDriver extends StatefulWidget {
-  String x;
-  EditBusDriver(String did) {
+  BusdriverModel x = BusdriverModel();
+  EditBusDriver(BusdriverModel did) {
     this.x = did;
   }
 
@@ -47,9 +48,25 @@ class _EditBusDriverState extends State<EditBusDriver> {
   List<BusdriverModel> busEdit = List<BusdriverModel>();
   List<BusModel> bus = List<BusModel>();
 
-  _EditBusDriverState(String x) {
-    this.idPro = x;
-    getDataDriver();
+  _EditBusDriverState(BusdriverModel x) {
+    print(x.dUsername);
+    this.idPro = x.did;
+    _usernamecontroller.text = x.dUsername;
+    _passwordcontroller.text = x.dPassword;
+    _emailcontroller.text = x.dEmail;
+    _gendercontroller.text = x.dSex;
+    if (_gendercontroller.text == 'male') {
+      this.id = 1;
+    } else {
+      this.id = 2;
+    }
+    _imagecontroller.text = x.dImage;
+    _namecontroller.text = x.dName;
+    _tellcontroller.text = x.dTell;
+    _dataTime = x.bdDate;
+    _buscontroller.text = x.cId;
+    _value = _buscontroller.text;
+    //getDataDriver();
     getBus();
   }
 
@@ -64,7 +81,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
     List jsonData = json.decode(response.body);
     busEdit = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
     setState(() {
-      setText();
+      //setText();
     });
     return null;
   }
@@ -211,9 +228,9 @@ class _EditBusDriverState extends State<EditBusDriver> {
       appBar: AppBar(
           title: Text(
         'แก้ไขข้อมูลคนขับรถ',
-        textScaleFactor: 1.2,
         style: TextStyle(
           color: Color(0xFF3a3a3a),
+          fontSize: ScreenUtil().setSp(60),
         ),
       )),
       body: Container(
@@ -258,7 +275,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                               'http://' +
                                                   Service.ip +
                                                   '/controlModel/showImage.php?name=' +
-                                                  busEdit[0].dImage,
+                                                  _imagecontroller.text,
                                               fit: BoxFit.fitWidth,
                                             ),
                                           ),
@@ -667,8 +684,8 @@ class _EditBusDriverState extends State<EditBusDriver> {
                           height: 10.0,
                         ),
                         ButtonTheme(
-                          minWidth: 250.0,
-                          height: 60.0,
+                          minWidth: ScreenUtil().setWidth(650),
+                          height: ScreenUtil().setHeight(170),
                           child: RaisedButton(
                             shape: new RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(23.0),

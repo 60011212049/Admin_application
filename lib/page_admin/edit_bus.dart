@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class EditBus extends StatefulWidget {
-  String idbus;
-  EditBus(String cid) {
+  BusModel idbus = BusModel();
+  EditBus(BusModel cid) {
     this.idbus = cid;
   }
 
@@ -26,8 +26,13 @@ class _EditBusState extends State<EditBus> {
   TextEditingController statuscontroller = TextEditingController();
   bool loadData = false;
 
-  _EditBusState(String idbus) {
-    getDataBus(idbus);
+  _EditBusState(BusModel idbus) {
+    namecontroller.text = idbus.cid;
+    if (idbus.cStatus == '1') {
+      statuscontroller.text = 'พร้อมใช้งาน';
+    } else if (idbus.cStatus == '0') {
+      statuscontroller.text = 'ไม่พร้อมใช้งาน';
+    }
   }
 
   @override
@@ -45,7 +50,6 @@ class _EditBusState extends State<EditBus> {
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
-    print(response.body);
     listBus = jsonData.map((i) => BusModel.fromJson(i)).toList();
     namecontroller.text = listBus[0].cid;
     if (listBus[0].cStatus == '1') {
@@ -186,8 +190,8 @@ class _EditBusState extends State<EditBus> {
                   height: ScreenUtil().setHeight(12),
                 ),
                 ButtonTheme(
-                  minWidth: 250.0,
-                  height: ScreenUtil().setHeight(160),
+                  minWidth: ScreenUtil().setWidth(650),
+                  height: ScreenUtil().setHeight(170),
                   child: RaisedButton(
                     shape: new RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(23.0),

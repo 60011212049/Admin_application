@@ -2,43 +2,38 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/custom_icons.dart';
-import 'package:adminapp/model/bus_model.dart';
-import 'package:adminapp/model/busdriver_model.dart';
-import 'package:adminapp/page_admin/add_bus.dart';
-import 'package:adminapp/page_admin/edit_bus.dart';
+import 'package:adminapp/model/admin_model.dart';
+import 'package:adminapp/page_admin/add_admin.dart';
+import 'package:adminapp/page_admin/edit_admin.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'package:toast/toast.dart';
 
-class ManageBus extends StatefulWidget {
+class ManageAdmin extends StatefulWidget {
   @override
-  _ManageBusState createState() => _ManageBusState();
+  _ManageAdminState createState() => _ManageAdminState();
 }
 
-class _ManageBusState extends State<ManageBus> {
-  List<BusModel> listBus = List<BusModel>();
-  List<BusdriverModel> listDriver = List<BusdriverModel>();
-  List<BusModel> listBusSearch = List<BusModel>();
+class _ManageAdminState extends State<ManageAdmin> {
+  List<AdminModel> admin = List<AdminModel>();
+  List<AdminModel> adminForSearch = List<AdminModel>();
+  bool loading = false;
   TextEditingController editcontroller = TextEditingController();
-  bool loadData = false;
-  var status = {};
-  String text = '2';
-
   @override
   void initState() {
     super.initState();
-    getDataBus();
-    getDataDriver();
+    getDataAdmin();
   }
 
   Future<Null> addTransciption(String id) async {
+    var status = {};
     SharedPreferences pref = await SharedPreferences.getInstance();
     status['status'] = 'add';
     status['aid'] = pref.getInt('tokenId');
-    status['type'] = 'ลบข้อมูลรถรางไอดี ' + id;
+    status['type'] = 'ลบข้อมูลผู้ดูแลไอดี ' + id;
     status['time'] = DateTime.now().toString();
     String jsonSt = json.encode(status);
     var response = await http.post(
@@ -47,74 +42,43 @@ class _ManageBusState extends State<ManageBus> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
-  Future<void> deleteBusPosition(String text) async {
+  Future<Null> getDataAdmin() async {
+    adminForSearch.clear();
+    var status = {};
+    status['status'] = 'show';
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/admin_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    admin = jsonData.map((e) => AdminModel.fromJson(e)).toList();
+    adminForSearch.addAll(admin);
+    loading = true;
+    setState(() {});
+  }
+
+  Future deleteAdmin(String id) async {
     var status = {};
     status['status'] = 'delete';
-    status['cid'] = text;
+    status['id'] = id;
     String jsonSt = json.encode(status);
     var response = await http.post(
-        'http://' + Service.ip + '/controlModel/busposition_model.php',
+        'http://' + Service.ip + '/controlModel/admin_model.php',
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-  }
-
-  Future<Null> getDataBus() async {
-    listBusSearch.clear();
-    status['status'] = 'show';
-    status['id'] = '';
-    String jsonSt = json.encode(status);
-    var response = await http.post(
-        'http://' + Service.ip + '/controlModel/bus_model.php',
-        body: jsonSt,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    List jsonData = json.decode(response.body);
-    listBus = jsonData.map((i) => BusModel.fromJson(i)).toList();
-    listBusSearch.addAll(listBus);
-    filterSearchResults(editcontroller.text);
-    setState(() {
-      loadData = true;
-    });
-    return null;
-  }
-
-  Future<Null> getDataDriver() async {
-    status['status'] = 'show';
-    status['id'] = '';
-    String jsonSt = json.encode(status);
-    var response = await http.post(
-        'http://' + Service.ip + '/controlModel/busdriver_model.php',
-        body: jsonSt,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    List jsonData = json.decode(response.body);
-    listDriver = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
-    setState(() {});
-    return null;
-  }
-
-  Future<Null> deleteBus(String id) async {
-    status['status'] = 'delete';
-    status['cid'] = id;
-    String jsonSt = json.encode(status);
-    var response = await http.post(
-        'http://' + Service.ip + '/controlModel/bus_model.php',
-        body: jsonSt,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    print(response.body + ' ' + response.statusCode.toString());
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
         setState(() {
           Toast.show("ลบข้อมูลไม่สำเร็จ", context,
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
-      } else if (response.body.toString() == 'Good') {
+      } else {
         Toast.show("ลบข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         addTransciption(id);
-        deleteBusPosition(id);
-        setState(() {
-          getDataBus();
-          getDataDriver();
-        });
+        getDataAdmin();
       }
     } else {
       setState(() {});
@@ -122,27 +86,25 @@ class _ManageBusState extends State<ManageBus> {
   }
 
   void filterSearchResults(String query) {
-    List<BusModel> dummySearchListBus = List<BusModel>();
-    List<BusdriverModel> dummySearchListDriver = List<BusdriverModel>();
-    dummySearchListBus.addAll(listBus);
-    dummySearchListDriver.addAll(listDriver);
+    List<AdminModel> dummySearchList = List<AdminModel>();
+    dummySearchList.addAll(admin);
     if (query.isNotEmpty) {
-      List<BusModel> dummyListDataBus = List<BusModel>();
-      List<BusdriverModel> dummyListDataDriver = List<BusdriverModel>();
-      dummySearchListBus.forEach((item) {
-        if ((item.cid.toLowerCase()).contains(query)) {
-          dummyListDataBus.add(item);
+      List<AdminModel> dummyListData = List<AdminModel>();
+      dummySearchList.forEach((item) {
+        if ((item.username.toLowerCase()).contains(query) ||
+            (item.email.toLowerCase()).contains(query)) {
+          dummyListData.add(item);
         }
       });
       setState(() {
-        listBusSearch.clear();
-        listBusSearch.addAll(dummyListDataBus);
+        adminForSearch.clear();
+        adminForSearch.addAll(dummyListData);
       });
       return;
     } else {
       setState(() {
-        listBusSearch.clear();
-        listBusSearch.addAll(listBus);
+        adminForSearch.clear();
+        adminForSearch.addAll(admin);
       });
     }
   }
@@ -152,7 +114,7 @@ class _ManageBusState extends State<ManageBus> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'จัดการข้อมูลรถ',
+          'จัดการข้อมูลผู้ดูแล',
           style: TextStyle(
             color: Color(0xFF3a3a3a),
             fontSize: ScreenUtil().setSp(60),
@@ -168,10 +130,10 @@ class _ManageBusState extends State<ManageBus> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AddBus(),
+                    builder: (context) => AddAdmin(),
                   )).then((value) {
-                getDataBus();
-                getDataDriver();
+                getDataAdmin();
+                setState(() {});
               });
             },
           ),
@@ -180,6 +142,13 @@ class _ManageBusState extends State<ManageBus> {
       body: Container(
         child: Column(
           children: <Widget>[
+            Text(
+              'รายชื่อผู้ดูแล',
+              style: TextStyle(
+                color: Colors.grey[800],
+                fontSize: 31.0,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
               child: TextField(
@@ -188,7 +157,7 @@ class _ManageBusState extends State<ManageBus> {
                 },
                 controller: editcontroller,
                 decoration: InputDecoration(
-                    labelText: "ค้นหาจากชื่อ",
+                    labelText: "ค้นหา",
                     labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
                     prefixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(
@@ -197,34 +166,30 @@ class _ManageBusState extends State<ManageBus> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: listBusSearch.length,
+                itemCount: adminForSearch.length,
                 itemBuilder: (BuildContext context, int index) {
                   return Card(
                     child: ListTile(
+                      leading: CircleAvatar(
+                          backgroundColor: Colors.grey[100],
+                          child: Icon(
+                            Icons1.person,
+                            color: Colors.grey[800],
+                          )),
                       title: Text(
-                        listBusSearch[index].cid,
+                        adminForSearch[index].username,
                         style: TextStyle(
                           color: Colors.grey[800],
-                          fontSize: ScreenUtil().setSp(55),
+                          fontSize: 23.0,
                         ),
                       ),
-                      subtitle: listDriver.length == 0
-                          ? Text(
-                              '',
-                              style: TextStyle(
-                                color: Colors.grey[800],
-                                fontSize: ScreenUtil().setSp(35),
-                              ),
-                            )
-                          : Text(
-                              'ชื่อคนขับ : ' +
-                                  checkDriver(
-                                      listDriver, listBusSearch[index].did),
-                              style: TextStyle(
-                                color: Colors.grey[800],
-                                fontSize: ScreenUtil().setSp(40),
-                              ),
-                            ),
+                      subtitle: Text(
+                        adminForSearch[index].tell,
+                        style: TextStyle(
+                          color: Colors.grey[800],
+                          fontSize: 13.0,
+                        ),
+                      ),
                       trailing: Wrap(
                         children: <Widget>[
                           IconButton(
@@ -237,11 +202,8 @@ class _ManageBusState extends State<ManageBus> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        EditBus(listBusSearch[index]),
-                                  )).then((value) {
-                                getDataBus();
-                                getDataDriver();
-                              });
+                                        EditAdmin(adminForSearch[index]),
+                                  )).then((value) => getDataAdmin());
                             },
                           ),
                           IconButton(
@@ -250,7 +212,7 @@ class _ManageBusState extends State<ManageBus> {
                               color: Colors.red,
                             ),
                             onPressed: () {
-                              deleteBus(listBusSearch[index].cid);
+                              deleteAdmin(adminForSearch[index].aid);
                             },
                           ),
                         ],
@@ -260,19 +222,10 @@ class _ManageBusState extends State<ManageBus> {
                 },
                 shrinkWrap: true,
               ),
-            ),
+            )
           ],
         ),
       ),
     );
-  }
-
-  String checkDriver(List<BusdriverModel> listDriver, String did) {
-    for (int i = 0; i < listDriver.length; i++) {
-      if (listDriver[i].did == did) {
-        return listDriver[i].dName;
-      } else {}
-    }
-    return '';
   }
 }

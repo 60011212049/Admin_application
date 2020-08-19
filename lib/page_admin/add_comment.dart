@@ -177,8 +177,8 @@ class _AddCommentState extends State<AddComment> {
                     ),
                     Center(
                       child: ButtonTheme(
-                        minWidth: 250.0,
-                        height: 60.0,
+                        minWidth: ScreenUtil().setWidth(650),
+                        height: ScreenUtil().setHeight(170),
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: RaisedButton(

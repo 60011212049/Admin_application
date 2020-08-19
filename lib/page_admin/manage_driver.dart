@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
 class ManageDriver extends StatefulWidget {
-  static List<BusdriverModel> busdriverList = List<BusdriverModel>();
   @override
   _ManageDriverState createState() => _ManageDriverState();
 }
@@ -206,8 +205,8 @@ class _ManageDriverState extends State<ManageDriver> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => EditBusDriver(
-                                        driverForSearch[index].did),
+                                    builder: (context) =>
+                                        EditBusDriver(driverForSearch[index]),
                                   )).then((value) => getDataDriver());
                             },
                           ),

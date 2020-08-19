@@ -6,6 +6,7 @@ import 'package:adminapp/model/bus_model.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:http/http.dart' as http;
@@ -530,8 +531,8 @@ class _AddBusDriverState extends State<AddBusDriver> {
                           height: 10.0,
                         ),
                         ButtonTheme(
-                          minWidth: 250.0,
-                          height: 60.0,
+                          minWidth: ScreenUtil().setWidth(650),
+                          height: ScreenUtil().setHeight(170),
                           child: RaisedButton(
                             shape: new RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(23.0),

@@ -1,13 +1,14 @@
 import 'package:adminapp/custom_icons.dart';
-import 'package:adminapp/model/admin_model.dart';
 import 'package:adminapp/page/loginPage.dart';
 import 'package:adminapp/page_admin/bus_location.dart';
+import 'package:adminapp/page_admin/editByadmin.dart';
+import 'package:adminapp/page_admin/manage_admin.dart';
+import 'package:adminapp/page_admin/manage_assesment.dart';
 import 'package:adminapp/page_admin/manage_bus.dart';
 import 'package:adminapp/page_admin/manage_bus_schedule.dart';
 import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_comment.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
-import 'package:adminapp/page_admin/manage_user.dart';
 import 'package:adminapp/page_admin/page_transcription.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,20 +22,24 @@ class AdminHome extends StatefulWidget {
 class _AdminHomeState extends State<AdminHome> {
   List listSvg = [
     "taxi-driver",
+    "admin",
     "bus1",
     "pointer",
     "calendar",
     "star2",
+    "feedback",
     "history",
     "bus-stop1",
   ];
 
   List listText = [
     "ข้อมูลคนขับรถ",
+    "ข้อมูลผู้ดูแล",
     "ข้อมูลรถ",
     "จุดรับส่งผู้โดยสาร",
     "ตารางการเดินรถ",
     "ความคิดเห็น",
+    "ผลการประเมิน",
     "ประวัติการใช้งาน",
     "ตำแหน่งปัจจุบันของรถ",
   ];
@@ -100,23 +105,27 @@ class _AdminHomeState extends State<AdminHome> {
         ),
         trailing: InkWell(
           child: PopupMenuButton<String>(
-            onSelected: (String value) {
-              setState(() async {
-                _selection = value;
-                if (value == 'Value1') {
-                } else if (value == 'Value2') {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  prefs.remove('tokenId');
-                  prefs.remove('tokenType');
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LogingPage(),
-                    ),
-                  );
-                }
-              });
+            onSelected: (String value) async {
+              _selection = value;
+              if (value == 'Value1') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EDitByAdmin(),
+                  ),
+                );
+              } else if (value == 'Value2') {
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.remove('tokenId');
+                prefs.remove('tokenType');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => LogingPage(),
+                  ),
+                );
+              }
+              setState(() {});
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               const PopupMenuItem<String>(
@@ -178,38 +187,53 @@ class _AdminHomeState extends State<AdminHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBus(),
+                          builder: (context) => ManageAdmin(),
                         ));
                   }
                   if (x == 2) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusstop(),
+                          builder: (context) => ManageBus(),
                         ));
                   }
                   if (x == 3) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageBusSchedule(),
+                          builder: (context) => ManageBusstop(),
                         ));
                   }
                   if (x == 4) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CommentPageAdmin(),
+                          builder: (context) => ManageBusSchedule(),
                         ));
                   }
                   if (x == 5) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => Transcription(),
+                          builder: (context) => CommentPageAdmin(),
                         ));
                   }
                   if (x == 6) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ManageAssesment(),
+                        ));
+                  }
+                  if (x == 7) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Transcription(),
+                      ),
+                    );
+                  }
+                  if (x == 8) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -233,7 +257,7 @@ class _AdminHomeState extends State<AdminHome> {
                           Padding(
                               padding:
                                   const EdgeInsets.only(bottom: 5, top: 10),
-                              child: (x >= listText.length - 2)
+                              child: (x >= listText.length - 3)
                                   ? Container()
                                   : Text(
                                       'จัดการ',
