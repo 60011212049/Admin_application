@@ -12,6 +12,7 @@ import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/page_busdriver/edit_busdriver.dart';
+import 'package:adminapp/page_busdriver/testCheck.dart';
 import 'package:adminapp/page_busdriver/work_schedule.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
@@ -47,10 +48,14 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   LocationData currentLocation;
   StreamSubscription stream;
   Timer timer;
+  String timeIn, timeOut, sidIn, sidOut;
+  String sid = '1';
+
   @override
   void initState() {
     super.initState();
     getDataDriver();
+    getDataBusstop();
     stream = location.onLocationChanged.listen((event) {
       print(event.latitude.toString() + ',' + event.longitude.toString());
       if (checkWork == true) {
@@ -75,7 +80,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     busstop = jsonData.map((i) => BusstopModel.fromJson(i)).toList();
-    setState(() {});
+    // setState(() {});
   }
 
   Future getDataDriver() async {
@@ -90,29 +95,61 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     busdriverModel = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    print(busdriverModel[0].cId);
     loading = true;
+    getSid(busdriverModel[0].cId);
     setState(() {});
+  }
+
+  Future sentDataWork() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var status = {};
+    status['status'] = 'add';
+    status['id'] = pref.getInt('tokenId').toString();
+    status['timeIn'] = timeIn;
+    status['timeOut'] = timeOut;
+    status['sidIn'] = sidIn;
+    status['sidOut'] = sidOut;
+    String jsonSt = json.encode(status);
+    // print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/statuswork_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
+  Future sentDatabusOutside() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var status = {};
+    status['status'] = 'add';
+    status['id'] = pref.getInt('tokenId').toString();
+    status['cid'] = busdriverModel[0].cId;
+    status['lat'] = currentLocation.latitude;
+    status['lng'] = currentLocation.longitude;
+    status['time'] = DateTime.now().toString();
+    ;
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/outside_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
   void updateLocation() async {
     Location location = Location();
     currentLocation = await location.getLocation();
-    String sid = '1';
     for (var i = 0; i < busstop.length; i++) {
       var lat = double.parse(busstop[i].sLongitude);
       var lng = double.parse(busstop[i].sLatitude);
-      if ((lat >= (currentLocation.latitude - 0.0006) &&
-              lat <= (currentLocation.latitude + 0.0006)) &&
-          (lng >= (currentLocation.longitude - 0.0006) &&
-              lng <= (currentLocation.longitude - 0.0006))) {
+      if ((lat >= (currentLocation.latitude - 0.0002) &&
+              lat <= (currentLocation.latitude + 0.0002)) &&
+          (lng >= (currentLocation.longitude - 0.0002) &&
+              lng <= (currentLocation.longitude + 0.0002))) {
         sid = busstop[i].sid;
         print('Check point Sid : ' + sid);
       }
     }
-    print('update location ' +
-        currentLocation.latitude.toString() +
-        ' ' +
-        currentLocation.longitude.toString());
     var status = {};
     status['status'] = 'update';
     status['sid'] = sid;
@@ -125,12 +162,27 @@ class _BusdriverHomeState extends State<BusdriverHome> {
         TimeOfDay.now().minute.toString() +
         ':00';
     String jsonSt = json.encode(status);
-    print(jsonSt);
+    //print(jsonSt);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/busposition_model.php',
         body: jsonSt,
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
-    print(response.body);
+    //print(response.body);
+  }
+
+  void getSid(String cId) async {
+    var status = {};
+    status['status'] = 'showId';
+    status['id'] = cId;
+    String jsonSt = json.encode(status);
+    // print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busposition_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    busPos = jsonData.map((i) => BusPositionModel.fromJson(i)).toList();
+    //print(response.body);
   }
 
   @override
@@ -359,7 +411,24 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                       ],
                     ),
                     color: Colors.green,
-                    onPressed: () {
+                    onPressed: () async {
+                      timeOut = DateTime.now().toString();
+                      sidOut = sid;
+                      print(timeIn +
+                          ' , ' +
+                          sidIn +
+                          ' : ' +
+                          timeOut +
+                          ' , ' +
+                          sidOut);
+                      Location location = Location();
+                      currentLocation = await location.getLocation();
+                      TestCheck testCheck = TestCheck();
+                      String res = testCheck.checkLatlnt(currentLocation);
+                      sentDataWork();
+                      if (res != 'inrange') {
+                        sentDatabusOutside();
+                      }
                       checkWork = false;
                       setState(() {});
                     },
@@ -400,6 +469,11 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                           builder: (context) => CommentPage(),
                         ));
                   } else if (x == 1) {
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //       builder: (context) => TestCheck(),
+                    //     ));
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -467,6 +541,9 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                     ),
                     onPressed: () {
                       checkWork = true;
+                      timeIn = DateTime.now().toString();
+                      sidIn = busPos[0].sid;
+                      print(timeIn + ' : ' + sidIn);
                       setState(() {});
                       Navigator.of(context).pop();
                     },

@@ -6,6 +6,7 @@ import 'package:adminapp/page_admin/add_comment.dart';
 import 'package:adminapp/page_admin/edit_comment.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:chips_choice/chips_choice.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/screenutil.dart';
@@ -24,6 +25,17 @@ class _CommentPageState extends State<CommentPageAdmin> {
   List<CommentModel> commentForSearch = List<CommentModel>();
   TextEditingController editcontroller = TextEditingController();
   bool loading = false;
+  int _value = 0;
+  int tag = 1;
+  List<String> options = [
+    '5',
+    '4',
+    '3',
+    '2',
+    '1',
+  ];
+
+  List<bool> indexCh = [false, false, false, false, false];
   @override
   void initState() {
     super.initState();
@@ -151,24 +163,24 @@ class _CommentPageState extends State<CommentPageAdmin> {
         child: loading == true
             ? Column(
                 children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(top: 10, left: 10, right: 10),
-                    child: TextField(
-                      onChanged: (value) {
-                        filterSearchResults(value);
-                      },
-                      controller: editcontroller,
-                      decoration: InputDecoration(
-                          labelText: "ค้นหา",
-                          labelStyle:
-                              TextStyle(fontSize: ScreenUtil().setSp(50)),
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(25.0)))),
-                    ),
-                  ),
+                  // Padding(
+                  //   padding:
+                  //       const EdgeInsets.only(top: 10, left: 10, right: 10),
+                  //   child: TextField(
+                  //     onChanged: (value) {
+                  //       filterSearchResults(value);
+                  //     },
+                  //     controller: editcontroller,
+                  //     decoration: InputDecoration(
+                  //         labelText: "ค้นหา",
+                  //         labelStyle:
+                  //             TextStyle(fontSize: ScreenUtil().setSp(50)),
+                  //         prefixIcon: Icon(Icons.search),
+                  //         border: OutlineInputBorder(
+                  //             borderRadius:
+                  //                 BorderRadius.all(Radius.circular(25.0)))),
+                  //   ),
+                  // ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Column(
@@ -198,6 +210,25 @@ class _CommentPageState extends State<CommentPageAdmin> {
                               itemSize: 40.0,
                               unratedColor: Colors.grey[300],
                             ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            (indexCh[4] != true)
+                                ? borderSearchRating(5)
+                                : boderSearchRating2(5),
+                            (indexCh[3] != true)
+                                ? borderSearchRating(4)
+                                : boderSearchRating2(4),
+                            (indexCh[2] != true)
+                                ? borderSearchRating(3)
+                                : boderSearchRating2(3),
+                            (indexCh[1] != true)
+                                ? borderSearchRating(2)
+                                : boderSearchRating2(2),
+                            (indexCh[0] != true)
+                                ? borderSearchRating(1)
+                                : boderSearchRating2(1),
                           ],
                         ),
                         Divider(
@@ -334,6 +365,104 @@ class _CommentPageState extends State<CommentPageAdmin> {
                 ),
               ),
         onRefresh: refreshList,
+      ),
+    );
+  }
+
+  Padding boderSearchRating2(int i) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 5),
+      child: Container(
+        width: ScreenUtil().setWidth(120),
+        height: ScreenUtil().setHeight(70),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey[700],
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+          color: Colors.yellow[700],
+        ),
+        child: InkWell(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                i.toString(),
+                style: TextStyle(
+                  color: Colors.grey[700],
+                ),
+              ),
+              Icon(
+                Icons.star,
+                size: 12,
+                color: Colors.grey[700],
+              )
+            ],
+          ),
+          onTap: () {
+            if (indexCh[i - 1] == true) {
+              indexCh[i - 1] = false;
+            } else if (indexCh[i - 1] == false) {
+              for (var i = 0; i < indexCh.length; i++) {
+                indexCh[i] = false;
+              }
+              indexCh[i - 1] = true;
+            }
+            print(indexCh[i - 1]);
+            setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
+  Padding borderSearchRating(int i) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 5),
+      child: Container(
+        width: ScreenUtil().setWidth(120),
+        height: ScreenUtil().setHeight(70),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+          // color: Colors.white,
+        ),
+        child: InkWell(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                i.toString(),
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+              Icon(
+                Icons.star,
+                size: 12,
+                color: Colors.grey,
+              )
+            ],
+          ),
+          onTap: () {
+            if (indexCh[i - 1] == true) {
+              indexCh[i - 1] = false;
+            } else if (indexCh[i - 1] == false) {
+              for (var i = 0; i < indexCh.length; i++) {
+                indexCh[i] = false;
+              }
+              indexCh[i - 1] = true;
+            }
+            print(indexCh[i - 1]);
+            setState(() {});
+          },
+        ),
       ),
     );
   }

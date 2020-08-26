@@ -9,6 +9,9 @@ import 'package:adminapp/page_admin/manage_bus_schedule.dart';
 import 'package:adminapp/page_admin/manage_busstop.dart';
 import 'package:adminapp/page_admin/manage_comment.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
+import 'package:adminapp/page_admin/manage_statuswork.dart';
+import 'package:adminapp/page_admin/page_evaluation.dart';
+import 'package:adminapp/page_admin/page_outsidebus.dart';
 import 'package:adminapp/page_admin/page_transcription.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -27,6 +30,8 @@ class _AdminHomeState extends State<AdminHome> {
     "pointer",
     "calendar",
     "star2",
+    "shield",
+    "warring_car",
     "feedback",
     "history",
     "bus-stop1",
@@ -39,6 +44,8 @@ class _AdminHomeState extends State<AdminHome> {
     "จุดรับส่งผู้โดยสาร",
     "ตารางการเดินรถ",
     "ความคิดเห็น",
+    "การเข้าออกงานคนขับ",
+    "รถออกนอกจุด",
     "ผลการประเมิน",
     "ประวัติการใช้งาน",
     "ตำแหน่งปัจจุบันของรถ",
@@ -222,10 +229,25 @@ class _AdminHomeState extends State<AdminHome> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ManageAssesment(),
+                          builder: (context) => ManageStatusWork(),
                         ));
                   }
                   if (x == 7) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PageOutSideBus(),
+                      ),
+                    );
+                  }
+                  if (x == 8) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PageEvaluation(),
+                        ));
+                  }
+                  if (x == 9) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -233,7 +255,7 @@ class _AdminHomeState extends State<AdminHome> {
                       ),
                     );
                   }
-                  if (x == 8) {
+                  if (x == 10) {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -242,40 +264,51 @@ class _AdminHomeState extends State<AdminHome> {
                   }
                 },
                 child: Center(
-                  child: Wrap(
-                    children: <Widget>[
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            height: ScreenUtil().setHeight(160),
-                            child: Image(
-                              image: AssetImage(
-                                  'asset/icons/' + listSvg[x] + '.png'),
-                            ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: ScreenUtil().setHeight(160),
+                        child: Image(
+                          image:
+                              AssetImage('asset/icons/' + listSvg[x] + '.png'),
+                        ),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(bottom: 5, top: 10),
+                          child: (x >= listText.length - 4)
+                              ? Container()
+                              : Text(
+                                  'จัดการ',
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: ScreenUtil()
+                                        .setSp(49, allowFontScalingSelf: true),
+                                  ),
+                                )),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: (x == listText.length - 4)
+                            ? Text(
+                                'ตรวจสอบ',
+                                style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: ScreenUtil()
+                                      .setSp(49, allowFontScalingSelf: true),
+                                ),
+                              )
+                            : Container(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10, right: 10),
+                        child: Text(
+                          listText[x],
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: ScreenUtil()
+                                .setSp(49, allowFontScalingSelf: true),
                           ),
-                          Padding(
-                              padding:
-                                  const EdgeInsets.only(bottom: 5, top: 10),
-                              child: (x >= listText.length - 3)
-                                  ? Container()
-                                  : Text(
-                                      'จัดการ',
-                                      style: TextStyle(
-                                        color: Colors.grey[800],
-                                        fontSize: ScreenUtil().setSp(57,
-                                            allowFontScalingSelf: true),
-                                      ),
-                                    )),
-                          Text(
-                            listText[x],
-                            style: TextStyle(
-                              color: Colors.grey[800],
-                              fontSize: ScreenUtil()
-                                  .setSp(57, allowFontScalingSelf: true),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ],
                   ),

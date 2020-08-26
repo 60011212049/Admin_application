@@ -22,10 +22,18 @@ class _ManageAdminState extends State<ManageAdmin> {
   List<AdminModel> adminForSearch = List<AdminModel>();
   bool loading = false;
   TextEditingController editcontroller = TextEditingController();
+  String idAdmin;
   @override
   void initState() {
     super.initState();
     getDataAdmin();
+    getToken();
+  }
+
+  Future getToken() async {
+    SharedPreferences token = await SharedPreferences.getInstance();
+    idAdmin = token.getInt('tokenId').toString();
+    print(token.getInt('tokenId'));
   }
 
   Future<Null> addTransciption(String id) async {
@@ -206,15 +214,22 @@ class _ManageAdminState extends State<ManageAdmin> {
                                   )).then((value) => getDataAdmin());
                             },
                           ),
-                          IconButton(
-                            icon: Icon(
-                              Icons1.delete,
-                              color: Colors.red,
-                            ),
-                            onPressed: () {
-                              deleteAdmin(adminForSearch[index].aid);
-                            },
-                          ),
+                          idAdmin != adminForSearch[index].aid
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons1.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    deleteAdmin(adminForSearch[index].aid);
+                                  },
+                                )
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons1.delete,
+                                    color: Colors.white,
+                                  ),
+                                )
                         ],
                       ),
                     ),

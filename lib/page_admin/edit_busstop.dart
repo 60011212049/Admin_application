@@ -142,7 +142,7 @@ class _EditBusstopState extends State<EditBusstop> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'เพิ่มข้อมูลจุดรับส่ง',
+          'แก้ไขข้อมูลจุดรับส่ง',
           style: TextStyle(
             color: Color(0xFF3a3a3a),
             fontSize: ScreenUtil().setSp(60),
@@ -399,7 +399,7 @@ class _EditBusstopState extends State<EditBusstop> {
                             ),
                             color: Colors.blue[700],
                             child: Text(
-                              "ยืนยันการเพิ่มข้อมูล",
+                              "ยืนยันการแก้ไขข้อมูล",
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: ScreenUtil().setSp(70),

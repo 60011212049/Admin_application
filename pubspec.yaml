@@ -46,6 +46,7 @@ dependencies:
   flutter_screenutil: ^2.3.0
   day_night_time_picker:
   shared_preferences: ^0.5.8
+  chips_choice: ^1.2.0
 
 
 dev_dependencies:
