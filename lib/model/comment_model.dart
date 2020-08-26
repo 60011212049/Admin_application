@@ -17,6 +17,7 @@ class CommentModel {
     this.rPoint,
     this.rDetail,
     this.cStatus,
+    this.cImage,
   });
 
   String rid;
@@ -24,6 +25,7 @@ class CommentModel {
   String rPoint;
   String rDetail;
   String cStatus;
+  String cImage;
 
   factory CommentModel.fromJson(Map<String, dynamic> json) => CommentModel(
         rid: json["Rid"],
@@ -31,6 +33,7 @@ class CommentModel {
         rPoint: json["r_point"],
         rDetail: json["r_detail"],
         cStatus: json["c_status"],
+        cImage: json["c_image"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -39,5 +42,6 @@ class CommentModel {
         "r_point": rPoint,
         "r_detail": rDetail,
         "c_status": cStatus,
+        "c_image": cImage,
       };
 }

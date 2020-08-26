@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 
@@ -25,11 +26,14 @@ class _EditCommentState extends State<EditComment> {
   double ratingTrue;
   var _namecontroller = TextEditingController();
   var _detailcontroller = TextEditingController();
+  var _imagecontroller = TextEditingController();
   String id;
+  File image;
 
   _EditCommentState(CommentModel com) {
     _namecontroller.text = com.rName;
     _detailcontroller.text = com.rDetail;
+    _imagecontroller.text = com.cImage;
     ratingTrue = double.parse(com.rPoint);
     this.id = com.rid;
   }
@@ -183,8 +187,88 @@ class _EditCommentState extends State<EditComment> {
                         ),
                       ),
                     ),
-                    Container(
-                      height: ScreenUtil().setHeight(50),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Center(
+                          child: _imagecontroller.text == ''
+                              ? Icon(Icons.phone)
+                              : image != null
+                                  ? Center(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: 300,
+                                          maxHeight: 100,
+                                        ),
+                                        child: Image.file(
+                                          image,
+                                          fit: BoxFit.fitWidth,
+                                        ),
+                                      ),
+                                    )
+                                  : Center(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: 300,
+                                          maxHeight: 100,
+                                        ),
+                                        child: Image.network(
+                                          'http://' +
+                                              Service.ip +
+                                              '/controlModel/showImage.php?name=' +
+                                              _imagecontroller.text,
+                                          fit: BoxFit.fitWidth,
+                                        ),
+                                      ),
+                                    ),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'เพิ่มรูปภาพจากกล้อง',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.camera_alt),
+                          onPressed: () async {
+                            var image;
+                            try {
+                              image = await ImagePicker.pickImage(
+                                  source: ImageSource.camera);
+                              this.image = image;
+                            } catch (e) {}
+
+                            setState(() {});
+                          },
+                        ),
+                        Text(
+                          'หรืออัลบั้ม',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.image),
+                          onPressed: () async {
+                            var image;
+                            try {
+                              image = await ImagePicker.pickImage(
+                                  source: ImageSource.gallery);
+                              this.image = image;
+                            } catch (e) {}
+
+                            setState(() {});
+                          },
+                        ),
+                      ],
                     ),
                     Center(
                       child: ButtonTheme(

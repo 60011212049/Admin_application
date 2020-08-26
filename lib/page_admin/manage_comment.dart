@@ -25,7 +25,7 @@ class _CommentPageState extends State<CommentPageAdmin> {
   List<CommentModel> commentForSearch = List<CommentModel>();
   TextEditingController editcontroller = TextEditingController();
   bool loading = false;
-  int _value = 0;
+  bool isSearch = false;
   int tag = 1;
   List<String> options = [
     '5',
@@ -132,55 +132,104 @@ class _CommentPageState extends State<CommentPageAdmin> {
     }
   }
 
+  void filterSearchStar(int query) {
+    List<CommentModel> dummySearchList = List<CommentModel>();
+    dummySearchList.addAll(comment);
+    if (query != 0) {
+      List<CommentModel> dummyListData = List<CommentModel>();
+      dummySearchList.forEach((item) {
+        if (double.parse(item.rPoint).floor() == query) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        commentForSearch.clear();
+        commentForSearch.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        commentForSearch.clear();
+        commentForSearch.addAll(comment);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ความคิดเห็น',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหารีวิว',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'ความคิดเห็น',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddComment(),
-                  )).then((value) => refreshList());
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddComment(),
+                        )).then((value) => refreshList());
+                  },
+                ),
         ],
       ),
       body: RefreshIndicator(
         child: loading == true
             ? Column(
                 children: [
-                  // Padding(
-                  //   padding:
-                  //       const EdgeInsets.only(top: 10, left: 10, right: 10),
-                  //   child: TextField(
-                  //     onChanged: (value) {
-                  //       filterSearchResults(value);
-                  //     },
-                  //     controller: editcontroller,
-                  //     decoration: InputDecoration(
-                  //         labelText: "ค้นหา",
-                  //         labelStyle:
-                  //             TextStyle(fontSize: ScreenUtil().setSp(50)),
-                  //         prefixIcon: Icon(Icons.search),
-                  //         border: OutlineInputBorder(
-                  //             borderRadius:
-                  //                 BorderRadius.all(Radius.circular(25.0)))),
-                  //   ),
-                  // ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
                     child: Column(
@@ -330,13 +379,38 @@ class _CommentPageState extends State<CommentPageAdmin> {
                                     Container(
                                       width: ScreenUtil().setSp(140),
                                     ),
-                                    Container(
-                                      width: 310,
-                                      child: Text(
-                                        commentForSearch[index].rDetail,
-                                        style: TextStyle(
-                                            fontSize: ScreenUtil().setSp(49)),
-                                      ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        commentForSearch[index].rDetail != ''
+                                            ? Container(
+                                                width: 310,
+                                                child: Text(
+                                                  commentForSearch[index]
+                                                      .rDetail,
+                                                  style: TextStyle(
+                                                      fontSize: ScreenUtil()
+                                                          .setSp(49)),
+                                                ),
+                                              )
+                                            : Container(),
+                                        commentForSearch[index].cImage != ''
+                                            ? ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  maxWidth: 300,
+                                                  maxHeight: 100,
+                                                ),
+                                                child: Image.network(
+                                                  'http://' +
+                                                      Service.ip +
+                                                      '/controlModel/showImage.php?name=' +
+                                                      commentForSearch[index]
+                                                          .cImage,
+                                                  fit: BoxFit.fitHeight,
+                                                ))
+                                            : Container(),
+                                      ],
                                     ),
                                   ],
                                 )
@@ -403,13 +477,16 @@ class _CommentPageState extends State<CommentPageAdmin> {
           ),
           onTap: () {
             if (indexCh[i - 1] == true) {
+              filterSearchResults('');
               indexCh[i - 1] = false;
             } else if (indexCh[i - 1] == false) {
               for (var i = 0; i < indexCh.length; i++) {
                 indexCh[i] = false;
               }
+              filterSearchStar(i);
               indexCh[i - 1] = true;
             }
+
             print(indexCh[i - 1]);
             setState(() {});
           },
@@ -452,12 +529,14 @@ class _CommentPageState extends State<CommentPageAdmin> {
           ),
           onTap: () {
             if (indexCh[i - 1] == true) {
+              filterSearchResults('');
               indexCh[i - 1] = false;
             } else if (indexCh[i - 1] == false) {
               for (var i = 0; i < indexCh.length; i++) {
                 indexCh[i] = false;
               }
               indexCh[i - 1] = true;
+              filterSearchStar(i);
             }
             print(indexCh[i - 1]);
             setState(() {});

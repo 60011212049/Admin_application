@@ -5,9 +5,12 @@ import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toast/toast.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
 class AddComment extends StatefulWidget {
   @override
@@ -18,6 +21,8 @@ class _AddCommentState extends State<AddComment> {
   double ratingTrue;
   var _namecontroller = TextEditingController();
   var _detailcontroller = TextEditingController();
+  File image;
+  var fileName;
 
   Future addTransciption(String id) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -33,6 +38,38 @@ class _AddCommentState extends State<AddComment> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
+  Future<Map<String, dynamic>> _uploadImage() async {
+    final mimeTypeData =
+        lookupMimeType(image.path, headerBytes: [0xFF, 0xD8]).split('/');
+    final imageUploadRequest = http.MultipartRequest(
+        'POST', Uri.parse('http://' + Service.ip + '/controlModel/upload.php'));
+    final file = await http.MultipartFile.fromPath('image', image.path,
+        contentType: MediaType(mimeTypeData[0], mimeTypeData[1]));
+    imageUploadRequest.fields['ext'] = mimeTypeData[1];
+    imageUploadRequest.files.add(file);
+    print(mimeTypeData[0]);
+    print(mimeTypeData[1]);
+    print(image.path);
+    print(file.filename);
+    fileName = file.filename;
+    try {
+      final streamedResponse = await imageUploadRequest.send();
+      final response = await http.Response.fromStream(streamedResponse);
+      if (response.statusCode != 200) {
+        Toast.show("ไม่สามารถอัพรูปภาพได้ กรุณาใช้รูปภาพอื่น", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+        return null;
+      } else {
+        var res = await sentDataComment();
+      }
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      return responseData;
+    } catch (e) {
+      print(e);
+      return null;
+    }
+  }
+
   Future sentDataComment() async {
     var status = {};
     status['status'] = 'add';
@@ -43,6 +80,7 @@ class _AddCommentState extends State<AddComment> {
     }
     status['detail'] = _detailcontroller.text;
     status['point'] = ratingTrue.toString();
+    status['image'] = fileName;
     String jsonSt = json.encode(status);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/comment_model.php',
@@ -123,7 +161,7 @@ class _AddCommentState extends State<AddComment> {
                       color: Colors.black,
                     ),
                     Container(
-                      height: 20,
+                      height: 5,
                     ),
                     Container(
                       height: ScreenUtil().setHeight(250),
@@ -166,14 +204,78 @@ class _AddCommentState extends State<AddComment> {
                             ),
                           ),
                           keyboardType: TextInputType.multiline,
-                          maxLines: 8,
+                          maxLines: 5,
                           maxLength: 500,
                           controller: _detailcontroller,
                         ),
                       ),
                     ),
-                    Container(
-                      height: ScreenUtil().setHeight(50),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(10.0),
+                        child: Center(
+                          child: image == null
+                              ? Container()
+                              : Center(
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: 300,
+                                      maxHeight: 100,
+                                    ),
+                                    child: Image.file(
+                                      image,
+                                      fit: BoxFit.fitWidth,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'เพิ่มรูปภาพจากกล้อง',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.camera_alt),
+                          onPressed: () async {
+                            var image;
+                            try {
+                              image = await ImagePicker.pickImage(
+                                  source: ImageSource.camera);
+                              this.image = image;
+                            } catch (e) {}
+
+                            setState(() {});
+                          },
+                        ),
+                        Text(
+                          'หรืออัลบั้ม',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.image),
+                          onPressed: () async {
+                            var image;
+                            try {
+                              image = await ImagePicker.pickImage(
+                                  source: ImageSource.gallery);
+                              this.image = image;
+                            } catch (e) {}
+
+                            setState(() {});
+                          },
+                        ),
+                      ],
                     ),
                     Center(
                       child: ButtonTheme(
@@ -195,13 +297,17 @@ class _AddCommentState extends State<AddComment> {
                                 fontFamily: 'Quark',
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               print(_namecontroller.text);
                               print(_detailcontroller.text);
-
-                              setState(() {
-                                sentDataComment();
-                              });
+                              try {
+                                if (image == null) {
+                                  sentDataComment();
+                                } else {
+                                  final Map<String, dynamic> response =
+                                      await _uploadImage();
+                                }
+                              } catch (e) {}
                             },
                           ),
                         ),
