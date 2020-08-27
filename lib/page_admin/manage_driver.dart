@@ -20,7 +20,7 @@ class _ManageDriverState extends State<ManageDriver> {
   var status = {};
   List<BusdriverModel> busdriverList = List<BusdriverModel>();
   List<BusdriverModel> driverForSearch = List<BusdriverModel>();
-
+  bool isSearch = false;
   TextEditingController editcontroller = TextEditingController();
 
   @override
@@ -114,27 +114,71 @@ class _ManageDriverState extends State<ManageDriver> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'จัดการข้อมูลคนขับรถ',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหาคนขับรถจากชื่อ เบอร์โทร',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'จัดการข้อมูลคนขับรถ',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddBusDriver(),
-                  )).then((value) => getDataDriver());
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddBusDriver(),
+                        )).then((value) => getDataDriver());
+                  },
+                ),
         ],
       ),
       body: Container(
@@ -145,21 +189,6 @@ class _ManageDriverState extends State<ManageDriver> {
               style: TextStyle(
                 color: Colors.grey[800],
                 fontSize: 31.0,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                onChanged: (value) {
-                  filterSearchResults(value);
-                },
-                controller: editcontroller,
-                decoration: InputDecoration(
-                    labelText: "ค้นหาจากชื่อ อีเมล์ เบอร์โทร",
-                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
               ),
             ),
             Expanded(

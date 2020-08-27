@@ -21,6 +21,7 @@ class _ManageAdminState extends State<ManageAdmin> {
   List<AdminModel> admin = List<AdminModel>();
   List<AdminModel> adminForSearch = List<AdminModel>();
   bool loading = false;
+  bool isSearch = false;
   TextEditingController editcontroller = TextEditingController();
   String idAdmin;
   @override
@@ -121,30 +122,74 @@ class _ManageAdminState extends State<ManageAdmin> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'จัดการข้อมูลผู้ดูแล',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหาผู้ดูแลจากชื่อหรืออีเมลล์',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'จัดการข้อมูลผู้ดูแล',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddAdmin(),
-                  )).then((value) {
-                getDataAdmin();
-                setState(() {});
-              });
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddAdmin(),
+                        )).then((value) {
+                      getDataAdmin();
+                      setState(() {});
+                    });
+                  },
+                ),
         ],
       ),
       body: Container(
@@ -155,21 +200,6 @@ class _ManageAdminState extends State<ManageAdmin> {
               style: TextStyle(
                 color: Colors.grey[800],
                 fontSize: 31.0,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                onChanged: (value) {
-                  filterSearchResults(value);
-                },
-                controller: editcontroller,
-                decoration: InputDecoration(
-                    labelText: "ค้นหา",
-                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
               ),
             ),
             Expanded(

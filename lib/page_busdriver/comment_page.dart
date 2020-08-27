@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/model/comment_model.dart';
+import 'package:adminapp/page_admin/add_comment.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -16,7 +17,20 @@ class CommentPage extends StatefulWidget {
 class _CommentPageState extends State<CommentPage> {
   double rat = 0;
   List<CommentModel> comment = List<CommentModel>();
+  List<CommentModel> commentForSearch = List<CommentModel>();
+  TextEditingController editcontroller = TextEditingController();
   bool loading = false;
+  bool isSearch = false;
+  int tag = 1;
+  List<String> options = [
+    '5',
+    '4',
+    '3',
+    '2',
+    '1',
+  ];
+
+  List<bool> indexCh = [false, false, false, false, false];
   @override
   void initState() {
     super.initState();
@@ -33,10 +47,9 @@ class _CommentPageState extends State<CommentPage> {
     rat = double.parse((rat / x).toStringAsFixed(1));
   }
 
-  Future<Null> refreshList() async {
+  Future refreshList() async {
     var status = {};
     status['status'] = 'show';
-    status['id'] = '';
     String jsonSt = json.encode(status);
     var response = await http.post(
         'http://' + Service.ip + '/controlModel/comment_model.php',
@@ -44,24 +57,131 @@ class _CommentPageState extends State<CommentPage> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     this.comment = jsonData.map((i) => CommentModel.fromJson(i)).toList();
+    commentForSearch.addAll(comment);
+    filterSearchResults(editcontroller.text);
     loading = true;
     setState(() {
       calRating();
     });
-    return null;
+  }
+
+  void filterSearchResults(String query) {
+    List<CommentModel> dummySearchList = List<CommentModel>();
+    dummySearchList.addAll(comment);
+    if (query.isNotEmpty) {
+      List<CommentModel> dummyListData = List<CommentModel>();
+      dummySearchList.forEach((item) {
+        if ((item.rDetail.toLowerCase()).contains(query) ||
+            (item.rName.toLowerCase()).contains(query)) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        commentForSearch.clear();
+        commentForSearch.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        commentForSearch.clear();
+        commentForSearch.addAll(comment);
+      });
+    }
+  }
+
+  void filterSearchStar(int query) {
+    List<CommentModel> dummySearchList = List<CommentModel>();
+    dummySearchList.addAll(comment);
+    if (query != 0) {
+      List<CommentModel> dummyListData = List<CommentModel>();
+      dummySearchList.forEach((item) {
+        if (double.parse(item.rPoint).floor() == query) {
+          dummyListData.add(item);
+        }
+      });
+      setState(() {
+        commentForSearch.clear();
+        commentForSearch.addAll(dummyListData);
+      });
+      return;
+    } else {
+      setState(() {
+        commentForSearch.clear();
+        commentForSearch.addAll(comment);
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ความคิดเห็น',
-          textScaleFactor: 1.2,
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหารีวิว',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'ความคิดเห็น',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
+        actions: [
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddComment(),
+                        )).then((value) => refreshList());
+                  },
+                ),
+        ],
       ),
       body: RefreshIndicator(
         child: loading == true
@@ -98,6 +218,25 @@ class _CommentPageState extends State<CommentPage> {
                             ),
                           ],
                         ),
+                        Row(
+                          children: [
+                            (indexCh[4] != true)
+                                ? borderSearchRating(5)
+                                : boderSearchRating2(5),
+                            (indexCh[3] != true)
+                                ? borderSearchRating(4)
+                                : boderSearchRating2(4),
+                            (indexCh[2] != true)
+                                ? borderSearchRating(3)
+                                : boderSearchRating2(3),
+                            (indexCh[1] != true)
+                                ? borderSearchRating(2)
+                                : boderSearchRating2(2),
+                            (indexCh[0] != true)
+                                ? borderSearchRating(1)
+                                : boderSearchRating2(1),
+                          ],
+                        ),
                         Divider(
                           height: 5,
                           color: Colors.black,
@@ -107,13 +246,12 @@ class _CommentPageState extends State<CommentPage> {
                   ),
                   Expanded(
                     child: ListView.builder(
-                        itemCount: comment.length,
+                        itemCount: commentForSearch.length,
                         itemBuilder: (BuildContext context, int index) {
                           return Padding(
                             padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
                             child: Container(
                                 child: Wrap(
-                              // crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Padding(
                                   padding:
@@ -121,7 +259,7 @@ class _CommentPageState extends State<CommentPage> {
                                   child: CircleAvatar(
                                     backgroundColor: Colors.yellow[700],
                                     radius: ScreenUtil().setSp(55),
-                                    child: comment[index].rName == null
+                                    child: commentForSearch[index].rName == null
                                         ? Text(
                                             'user',
                                             style: TextStyle(
@@ -129,7 +267,7 @@ class _CommentPageState extends State<CommentPage> {
                                                     ScreenUtil().setSp(50)),
                                           )
                                         : Text(
-                                            comment[index]
+                                            commentForSearch[index]
                                                 .rName
                                                 .substring(0, 1),
                                             style: TextStyle(
@@ -145,7 +283,7 @@ class _CommentPageState extends State<CommentPage> {
                                         CrossAxisAlignment.start,
                                     children: <Widget>[
                                       Text(
-                                        comment[index].rName,
+                                        commentForSearch[index].rName,
                                         style: TextStyle(
                                             fontSize: ScreenUtil().setSp(51)),
                                       ),
@@ -154,7 +292,9 @@ class _CommentPageState extends State<CommentPage> {
                                             0, 0, 0, 5),
                                         child: RatingBarIndicator(
                                           rating: double.parse(
-                                              comment[index].rPoint.toString()),
+                                              commentForSearch[index]
+                                                  .rPoint
+                                                  .toString()),
                                           itemBuilder: (context, index) => Icon(
                                             Icons.star,
                                             color: Colors.amber,
@@ -164,17 +304,49 @@ class _CommentPageState extends State<CommentPage> {
                                           unratedColor: Colors.grey[300],
                                         ),
                                       ),
-                                      Container(
-                                        width: 310,
-                                        child: Text(
-                                          comment[index].rDetail,
-                                          style: TextStyle(
-                                              fontSize: ScreenUtil().setSp(49)),
-                                        ),
-                                      ),
                                     ],
                                   ),
                                 ),
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: ScreenUtil().setSp(140),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        commentForSearch[index].rDetail != ''
+                                            ? Container(
+                                                width: 310,
+                                                child: Text(
+                                                  commentForSearch[index]
+                                                      .rDetail,
+                                                  style: TextStyle(
+                                                      fontSize: ScreenUtil()
+                                                          .setSp(49)),
+                                                ),
+                                              )
+                                            : Container(),
+                                        commentForSearch[index].cImage != ''
+                                            ? ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  maxWidth: 300,
+                                                  maxHeight: 100,
+                                                ),
+                                                child: Image.network(
+                                                  'http://' +
+                                                      Service.ip +
+                                                      '/controlModel/showImage.php?name=' +
+                                                      commentForSearch[index]
+                                                          .cImage,
+                                                  fit: BoxFit.fitHeight,
+                                                ))
+                                            : Container(),
+                                      ],
+                                    ),
+                                  ],
+                                )
                               ],
                             )),
                           );
@@ -200,6 +372,109 @@ class _CommentPageState extends State<CommentPage> {
                 ),
               ),
         onRefresh: refreshList,
+      ),
+    );
+  }
+
+  Padding boderSearchRating2(int i) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 5),
+      child: Container(
+        width: ScreenUtil().setWidth(120),
+        height: ScreenUtil().setHeight(70),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey[700],
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+          color: Colors.yellow[700],
+        ),
+        child: InkWell(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                i.toString(),
+                style: TextStyle(
+                  color: Colors.grey[700],
+                ),
+              ),
+              Icon(
+                Icons.star,
+                size: 12,
+                color: Colors.grey[700],
+              )
+            ],
+          ),
+          onTap: () {
+            if (indexCh[i - 1] == true) {
+              filterSearchResults('');
+              indexCh[i - 1] = false;
+            } else if (indexCh[i - 1] == false) {
+              for (var i = 0; i < indexCh.length; i++) {
+                indexCh[i] = false;
+              }
+              filterSearchStar(i);
+              indexCh[i - 1] = true;
+            }
+
+            print(indexCh[i - 1]);
+            setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
+  Padding borderSearchRating(int i) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 5),
+      child: Container(
+        width: ScreenUtil().setWidth(120),
+        height: ScreenUtil().setHeight(70),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey,
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20.0),
+          ),
+          // color: Colors.white,
+        ),
+        child: InkWell(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                i.toString(),
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+              ),
+              Icon(
+                Icons.star,
+                size: 12,
+                color: Colors.grey,
+              )
+            ],
+          ),
+          onTap: () {
+            if (indexCh[i - 1] == true) {
+              filterSearchResults('');
+              indexCh[i - 1] = false;
+            } else if (indexCh[i - 1] == false) {
+              for (var i = 0; i < indexCh.length; i++) {
+                indexCh[i] = false;
+              }
+              indexCh[i - 1] = true;
+              filterSearchStar(i);
+            }
+            print(indexCh[i - 1]);
+            setState(() {});
+          },
+        ),
       ),
     );
   }

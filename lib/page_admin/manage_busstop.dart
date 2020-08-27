@@ -22,6 +22,7 @@ class ManageBusstop extends StatefulWidget {
 class _ManageBusstopState extends State<ManageBusstop> {
   TextEditingController editcontroller = TextEditingController();
   var status = {};
+  bool isSearch = false;
   List<BusstopModel> busstop = List<BusstopModel>();
   List<BusstopModel> busForSearch = List<BusstopModel>();
 
@@ -114,47 +115,91 @@ class _ManageBusstopState extends State<ManageBusstop> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'จัดการจัดรับส่งผู้โดยสาร',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหาจุดรับส่งผู้โดยสาร',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'จัดการจุดรับส่งผู้โดยสาร',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddBusstop(),
-                  )).then((value) => getBusstop());
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddBusstop(),
+                        )).then((value) => getBusstop());
+                  },
+                ),
         ],
       ),
       body: Container(
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                onChanged: (value) {
-                  filterSearchResults(value);
-                },
-                controller: editcontroller,
-                decoration: InputDecoration(
-                    labelText: "ค้นหาจากชื่อ",
-                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+            //   child: TextField(
+            //     onChanged: (value) {
+            //       filterSearchResults(value);
+            //     },
+            //     controller: editcontroller,
+            //     decoration: InputDecoration(
+            //         labelText: "ค้นหาจากชื่อ",
+            //         labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
+            //         prefixIcon: Icon(Icons.search),
+            //         border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+            //   ),
+            // ),
             Expanded(
                 child: ListView.builder(
               itemCount: busForSearch.length,

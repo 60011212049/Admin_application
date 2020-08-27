@@ -15,13 +15,13 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 class BusDriverEdit extends StatefulWidget {
-  String x;
-  BusDriverEdit(String did) {
-    this.x = did;
+  BusdriverModel tx = BusdriverModel();
+  BusDriverEdit(BusdriverModel did) {
+    tx = did;
   }
 
   @override
-  _EditBusDriverState createState() => _EditBusDriverState(x);
+  _EditBusDriverState createState() => _EditBusDriverState(tx);
 }
 
 class _EditBusDriverState extends State<BusDriverEdit> {
@@ -45,9 +45,23 @@ class _EditBusDriverState extends State<BusDriverEdit> {
   List<BusdriverModel> busEdit = List<BusdriverModel>();
   List<BusModel> bus = List<BusModel>();
 
-  _EditBusDriverState(String x) {
-    this.idPro = x;
-    getDataDriver();
+  _EditBusDriverState(BusdriverModel x) {
+    this.idPro = x.did;
+    _usernamecontroller.text = x.dUsername;
+    _passwordcontroller.text = x.dPassword;
+    _emailcontroller.text = x.dEmail;
+    _gendercontroller.text = x.dSex;
+    if (_gendercontroller.text == 'male') {
+      this.id = 1;
+    } else {
+      this.id = 2;
+    }
+    _imagecontroller.text = x.dImage;
+    _namecontroller.text = x.dName;
+    _tellcontroller.text = x.dTell;
+    _dataTime = x.bdDate;
+    _buscontroller.text = x.cId;
+    // getDataDriver();
     getBus();
   }
 
@@ -160,19 +174,15 @@ class _EditBusDriverState extends State<BusDriverEdit> {
     print(response.statusCode.toString() + ' ' + response.body.toString());
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
-        setState(() {
-          Toast.show("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        });
+        Toast.show("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         Toast.show("แก้ไขข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         bit = '';
         Navigator.pop(context);
       }
-    } else {
-      setState(() {});
-    }
+    } else {}
   }
 
   @override
@@ -228,7 +238,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                               'http://' +
                                                   Service.ip +
                                                   '/controlModel/showImage.php?name=' +
-                                                  busEdit[0].dImage,
+                                                  _imagecontroller.text,
                                               fit: BoxFit.fitWidth,
                                             ),
                                           ),
@@ -577,6 +587,8 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                                         Radius.circular(20.0))),
                                 prefixIcon: Icon(Icons1.phone_1),
                               ),
+                              keyboardType: TextInputType.numberWithOptions(
+                                  signed: false),
                               controller: _tellcontroller,
                             ),
                           ),

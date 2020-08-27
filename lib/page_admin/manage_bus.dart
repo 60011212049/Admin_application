@@ -24,6 +24,7 @@ class _ManageBusState extends State<ManageBus> {
   List<BusModel> listBusSearch = List<BusModel>();
   TextEditingController editcontroller = TextEditingController();
   bool loadData = false;
+  bool isSearch = false;
   var status = {};
   String text = '2';
 
@@ -151,50 +152,79 @@ class _ManageBusState extends State<ManageBus> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'จัดการข้อมูลรถ',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหารถ',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'จัดการข้อมูลรถ',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddBus(),
-                  )).then((value) {
-                getDataBus();
-                getDataDriver();
-              });
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddBus(),
+                        )).then((value) {
+                      getDataBus();
+                      getDataDriver();
+                    });
+                  },
+                ),
         ],
       ),
       body: Container(
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                onChanged: (value) {
-                  filterSearchResults(value);
-                },
-                controller: editcontroller,
-                decoration: InputDecoration(
-                    labelText: "ค้นหาจากชื่อ",
-                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              ),
-            ),
             Expanded(
               child: ListView.builder(
                 itemCount: listBusSearch.length,

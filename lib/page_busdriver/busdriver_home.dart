@@ -48,6 +48,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   LocationData currentLocation;
   StreamSubscription stream;
   Timer timer;
+  int l = 0, checkRound = 0;
   String timeIn, timeOut, sidIn, sidOut;
   String sid = '1';
 
@@ -57,8 +58,8 @@ class _BusdriverHomeState extends State<BusdriverHome> {
     getDataDriver();
     getDataBusstop();
     stream = location.onLocationChanged.listen((event) {
-      print(event.latitude.toString() + ',' + event.longitude.toString());
       if (checkWork == true) {
+        print(event.latitude.toString() + ',' + event.longitude.toString());
         updateLocation();
       } else {}
     });
@@ -137,36 +138,41 @@ class _BusdriverHomeState extends State<BusdriverHome> {
   }
 
   void updateLocation() async {
-    Location location = Location();
-    currentLocation = await location.getLocation();
-    for (var i = 0; i < busstop.length; i++) {
-      var lat = double.parse(busstop[i].sLongitude);
-      var lng = double.parse(busstop[i].sLatitude);
-      if ((lat >= (currentLocation.latitude - 0.0002) &&
-              lat <= (currentLocation.latitude + 0.0002)) &&
-          (lng >= (currentLocation.longitude - 0.0002) &&
-              lng <= (currentLocation.longitude + 0.0002))) {
-        sid = busstop[i].sid;
-        print('Check point Sid : ' + sid);
+    l = l + 1;
+    if (l % 2 == 0) {
+      print(l.toString() + ' update');
+      Location location = Location();
+      currentLocation = await location.getLocation();
+      for (var i = 0; i < busstop.length; i++) {
+        var lat = double.parse(busstop[i].sLongitude);
+        var lng = double.parse(busstop[i].sLatitude);
+        if ((lat >= (currentLocation.latitude - 0.0002) &&
+                lat <= (currentLocation.latitude + 0.0002)) &&
+            (lng >= (currentLocation.longitude - 0.0002) &&
+                lng <= (currentLocation.longitude + 0.0002))) {
+          sid = busstop[i].sid;
+          print('Check point Sid : ' + sid);
+        }
       }
+      var status = {};
+      status['status'] = 'update';
+      status['sid'] = sid;
+      status['Cid'] = busdriverModel[0].cId;
+      status['longitude'] = currentLocation.longitude.toString();
+      status['latitude'] = currentLocation.latitude.toString();
+      status['date'] = DateTime.now().toString();
+      status['time'] = TimeOfDay.now().hour.toString() +
+          ':' +
+          TimeOfDay.now().minute.toString() +
+          ':00';
+      String jsonSt = json.encode(status);
+      //print(jsonSt);
+      var response = await http.post(
+          'http://' + Service.ip + '/controlModel/busposition_model.php',
+          body: jsonSt,
+          headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     }
-    var status = {};
-    status['status'] = 'update';
-    status['sid'] = sid;
-    status['Cid'] = busdriverModel[0].cId;
-    status['longitude'] = currentLocation.longitude.toString();
-    status['latitude'] = currentLocation.latitude.toString();
-    status['date'] = DateTime.now().toString();
-    status['time'] = TimeOfDay.now().hour.toString() +
-        ':' +
-        TimeOfDay.now().minute.toString() +
-        ':00';
-    String jsonSt = json.encode(status);
-    //print(jsonSt);
-    var response = await http.post(
-        'http://' + Service.ip + '/controlModel/busposition_model.php',
-        body: jsonSt,
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+
     //print(response.body);
   }
 
@@ -254,7 +260,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BusDriverEdit(busdriverModel[0].did),
+                    builder: (context) => BusDriverEdit(busdriverModel[0]),
                   ),
                 ).then((value) => getDataDriver());
               } else if (value == 'Value2') {
@@ -469,11 +475,6 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                           builder: (context) => CommentPage(),
                         ));
                   } else if (x == 1) {
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(
-                    //       builder: (context) => TestCheck(),
-                    //     ));
                     Navigator.push(
                       context,
                       MaterialPageRoute(

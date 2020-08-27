@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/model/evaluation_model.dart';
+import 'package:adminapp/page_admin/add_evaluation.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,6 +18,7 @@ class _PageEvaluationState extends State<PageEvaluation> {
   List<EvaluationModel> evaluationForSearch = List<EvaluationModel>();
   TextEditingController editcontroller = TextEditingController();
   bool loading = false;
+  bool isSearch = false;
   int i = 0;
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _PageEvaluationState extends State<PageEvaluation> {
   }
 
   Future<Null> getDataEvaluation() async {
+    evaluationForSearch.clear();
     var status = {};
     status['status'] = 'show';
     status['id'] = '';
@@ -83,51 +86,93 @@ class _PageEvaluationState extends State<PageEvaluation> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'ผลการประเมิน',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหาผลประเมิน',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'ผลการประเมิน',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              // Navigator.push(
-              //     context,
-              //     MaterialPageRoute(
-              //       builder: (context) => AddBusSchedule(),
-              //     )).then((value) {
-              //   this.i = 0;
-              //   getDataBusSchedule();
-              // });
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AssessmentFormPage(),
+                      ),
+                    ).then((value) => getDataEvaluation());
+                  },
+                ),
         ],
       ),
       body: Container(
         child: ListView(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                onChanged: (value) {
-                  this.i = 0;
-                  filterSearchResults(value);
-                },
-                controller: editcontroller,
-                decoration: InputDecoration(
-                    labelText: "ค้นหา",
-                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+            //   child: TextField(
+            //     onChanged: (value) {
+            //       this.i = 0;
+            //       filterSearchResults(value);
+            //     },
+            //     controller: editcontroller,
+            //     decoration: InputDecoration(
+            //         labelText: "ค้นหา",
+            //         labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
+            //         prefixIcon: Icon(Icons.search),
+            //         border: OutlineInputBorder(
+            //             borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+            //   ),
+            // ),
             Container(
               child: Center(
                 child: Center(

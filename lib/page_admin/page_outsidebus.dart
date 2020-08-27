@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/model/outsidebus_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class PageOutSideBus extends StatefulWidget {
   @override
@@ -14,12 +16,16 @@ class PageOutSideBus extends StatefulWidget {
 
 class _PageOutSideBusState extends State<PageOutSideBus> {
   List<OutSideBusModel> outSide = List<OutSideBusModel>();
+  List<BusdriverModel> driver = List<BusdriverModel>();
+  int check = 0;
   var status = {};
   bool loading = false;
+  DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
   @override
   void initState() {
     super.initState();
     getDataOutSideBus();
+    getDataBusDriver();
   }
 
   Future<Null> getDataOutSideBus() async {
@@ -32,8 +38,28 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     outSide = jsonData.map((i) => OutSideBusModel.fromJson(i)).toList();
-    loading = true;
-    setState(() {});
+    check++;
+    if (check == 2) {
+      loading = true;
+      setState(() {});
+    }
+  }
+
+  Future<Null> getDataBusDriver() async {
+    status['status'] = 'show';
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    driver = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    check++;
+    if (check == 2) {
+      loading = true;
+      setState(() {});
+    }
   }
 
   @override
@@ -58,7 +84,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                       sortColumnIndex: 1,
                       columns: [
                         DataColumn(
-                          label: textColumn('รหัสคนขับ'),
+                          label: textColumn('ชื่อคนขับ'),
                         ),
                         DataColumn(
                           label: textColumn('รถราง'),
@@ -74,9 +100,12 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                                   cells: [
                                     DataCell(
                                       Container(
-                                        width: ScreenUtil().setWidth(50),
+                                        width: ScreenUtil().setWidth(100),
                                         child: Text(
-                                          data.did,
+                                          driver
+                                              .firstWhere((element) =>
+                                                  element.did == data.did)
+                                              .dName,
                                           style: TextStyle(
                                             fontSize: ScreenUtil().setSp(40),
                                             fontFamily: 'Quark',
@@ -90,7 +119,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                                         child: Text(
                                           data.cid,
                                           style: TextStyle(
-                                            fontSize: ScreenUtil().setSp(42),
+                                            fontSize: ScreenUtil().setSp(40),
                                             fontFamily: 'Quark',
                                           ),
                                         ),
@@ -100,9 +129,10 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                                       Container(
                                         width: ScreenUtil().setWidth(400),
                                         child: Text(
-                                          data.outDate.toString(),
+                                          DateFormat('kk:mm dd-MM-yyyy')
+                                              .format(data.outDate),
                                           style: TextStyle(
-                                            fontSize: ScreenUtil().setSp(40),
+                                            fontSize: ScreenUtil().setSp(35),
                                             fontFamily: 'Quark',
                                           ),
                                         ),
@@ -121,7 +151,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                                       child: Text(
                                         '',
                                         style: TextStyle(
-                                          fontSize: ScreenUtil().setSp(40),
+                                          fontSize: ScreenUtil().setSp(35),
                                           fontFamily: 'Quark',
                                         ),
                                       ),
@@ -133,7 +163,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                                       child: Text(
                                         '',
                                         style: TextStyle(
-                                          fontSize: ScreenUtil().setSp(42),
+                                          fontSize: ScreenUtil().setSp(35),
                                           fontFamily: 'Quark',
                                         ),
                                       ),
@@ -145,7 +175,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
                                       child: Text(
                                         '',
                                         style: TextStyle(
-                                          fontSize: ScreenUtil().setSp(40),
+                                          fontSize: ScreenUtil().setSp(35),
                                           fontFamily: 'Quark',
                                         ),
                                       ),
@@ -165,7 +195,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
     return Text(
       data,
       style: TextStyle(
-        fontSize: ScreenUtil().setSp(60),
+        fontSize: ScreenUtil().setSp(55),
         fontFamily: 'Quark',
         color: Color(0xFF3a3a3a),
       ),

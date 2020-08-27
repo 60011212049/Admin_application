@@ -23,6 +23,7 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
   TextEditingController editcontroller = TextEditingController();
   var status = {};
   bool loading = false;
+  bool isSearch = false;
   int i = 0;
   @override
   void initState() {
@@ -56,6 +57,7 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
   }
 
   Future<Null> getDataBusSchedule() async {
+    busScheduleForSearch.clear();
     status['status'] = 'show';
     status['id'] = '';
     String jsonSt = json.encode(status);
@@ -68,6 +70,7 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
     busSchedule = jsonData.map((i) => BusscheduleModel.fromJson(i)).toList();
     busScheduleForSearch.addAll(busSchedule);
     loading = true;
+    this.i = 0;
     setState(() {});
   }
 
@@ -90,14 +93,16 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         getDataBusSchedule();
         addTransciption(id);
-        setState(() {});
+        this.i = 0;
       }
     } else {
+      this.i = 0;
       setState(() {});
     }
   }
 
   void filterSearchResults(String query) {
+    this.i = 0;
     List<BusscheduleModel> dummySearchList = List<BusscheduleModel>();
     dummySearchList.addAll(busSchedule);
     if (query.isNotEmpty) {
@@ -109,11 +114,13 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
         }
       });
       setState(() {
+        this.i = 0;
         busScheduleForSearch.clear();
         busScheduleForSearch.addAll(dummyListData);
       });
       return;
     } else {
+      this.i = 0;
       setState(() {
         busScheduleForSearch.clear();
         busScheduleForSearch.addAll(busSchedule);
@@ -125,51 +132,82 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'จัดการตารางการเดินรถ',
-          style: TextStyle(
-            color: Color(0xFF3a3a3a),
-            fontSize: ScreenUtil().setSp(60),
-          ),
-        ),
+        title: isSearch == true
+            ? Directionality(
+                textDirection: Directionality.of(context),
+                child: TextField(
+                  key: Key('SearchBarTextField'),
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                      hintText: 'ค้นหาตารางเดินรถ',
+                      hintStyle: TextStyle(fontSize: 20),
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      border: InputBorder.none),
+                  onChanged: (value) {
+                    this.i = 0;
+                    filterSearchResults(value);
+                  },
+                  autofocus: true,
+                  controller: editcontroller,
+                ),
+              )
+            : Text(
+                'จัดการตารางการเดินรถ',
+                style: TextStyle(
+                  color: Color(0xFF3a3a3a),
+                  fontSize: ScreenUtil().setSp(60),
+                ),
+              ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 30,
-            ),
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddBusSchedule(),
-                  )).then((value) {
-                this.i = 0;
-                getDataBusSchedule();
-              });
-            },
-          ),
+          isSearch == true
+              ? IconButton(
+                  icon: Icon(
+                    Icons.close,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    editcontroller.text = '';
+                    filterSearchResults('');
+                    this.i = 0;
+                    isSearch = false;
+                    setState(() {});
+                  },
+                )
+              : IconButton(
+                  icon: Icon(
+                    Icons.search,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    isSearch = true;
+                    this.i = 0;
+                    setState(() {});
+                  },
+                ),
+          isSearch == true
+              ? Container()
+              : IconButton(
+                  icon: Icon(
+                    Icons.add,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddBusSchedule(),
+                        )).then((value) {
+                      this.i = 0;
+                      getDataBusSchedule();
+                    });
+                  },
+                ),
         ],
       ),
       body: Container(
         child: ListView(
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
-              child: TextField(
-                onChanged: (value) {
-                  this.i = 0;
-                  filterSearchResults(value);
-                },
-                controller: editcontroller,
-                decoration: InputDecoration(
-                    labelText: "ค้นหาจากชื่อและเวลา",
-                    labelStyle: TextStyle(fontSize: ScreenUtil().setSp(50)),
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-              ),
-            ),
             Container(
               child: Center(
                 child: DataTable(
@@ -260,8 +298,8 @@ class _ManageBusScheduleState extends State<ManageBusSchedule> {
                                           size: ScreenUtil().setSp(60),
                                         ),
                                         onPressed: () {
-                                          deleteDriver(data.tCid);
                                           this.i = 0;
+                                          deleteDriver(data.tCid);
                                         },
                                       ),
                                     ],

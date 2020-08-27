@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/model/statuswork_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class ManageStatusWork extends StatefulWidget {
   @override
@@ -14,12 +16,17 @@ class ManageStatusWork extends StatefulWidget {
 
 class _ManageStatusWorkState extends State<ManageStatusWork> {
   List<StatusWorkModel> stWork = List<StatusWorkModel>();
+  List<BusdriverModel> driver = List<BusdriverModel>();
+  int check = 0;
   var status = {};
   bool loading = false;
+
+  DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
   @override
   void initState() {
     super.initState();
     getDataStatusWork();
+    getDataBusDriver();
   }
 
   Future<Null> getDataStatusWork() async {
@@ -32,8 +39,28 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     stWork = jsonData.map((i) => StatusWorkModel.fromJson(i)).toList();
-    loading = true;
-    setState(() {});
+    check++;
+    if (check == 2) {
+      loading = true;
+      setState(() {});
+    }
+  }
+
+  Future<Null> getDataBusDriver() async {
+    status['status'] = 'show';
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busdriver_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    driver = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
+    check++;
+    if (check == 2) {
+      loading = true;
+      setState(() {});
+    }
   }
 
   @override
@@ -41,7 +68,7 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'ตรวจสอบรถออกนอกจุด',
+            'ตรวจสอบสถานะการเข้างาน',
             style: TextStyle(
               color: Color(0xFF3a3a3a),
               fontSize: ScreenUtil().setSp(60),
@@ -58,7 +85,7 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
                       sortColumnIndex: 1,
                       columns: [
                         DataColumn(
-                          label: textColumn('รหัสคนขับ'),
+                          label: textColumn('ชื่อคนขับ'),
                         ),
                         DataColumn(
                           label: textColumn('เข้าเวลา'),
@@ -82,9 +109,12 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
                                       Container(
                                         width: ScreenUtil().setWidth(200),
                                         child: Text(
-                                          data.did,
+                                          driver
+                                              .firstWhere((element) =>
+                                                  element.did == data.did)
+                                              .dName,
                                           style: TextStyle(
-                                            fontSize: ScreenUtil().setSp(30),
+                                            fontSize: ScreenUtil().setSp(35),
                                             fontFamily: 'Quark',
                                           ),
                                         ),
@@ -94,7 +124,8 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
                                       Container(
                                         width: ScreenUtil().setWidth(250),
                                         child: Text(
-                                          data.inDate,
+                                          DateFormat('kk:mm dd-MM-yyyy').format(
+                                              DateTime.parse(data.inDate)),
                                           style: TextStyle(
                                             fontSize: ScreenUtil().setSp(33),
                                             fontFamily: 'Quark',
@@ -106,7 +137,8 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
                                       Container(
                                         width: ScreenUtil().setWidth(250),
                                         child: Text(
-                                          data.outDate,
+                                          DateFormat('kk:mm dd-MM-yyyy').format(
+                                              DateTime.parse(data.outDate)),
                                           style: TextStyle(
                                             fontSize: ScreenUtil().setSp(33),
                                             fontFamily: 'Quark',
