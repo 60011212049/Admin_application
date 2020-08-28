@@ -187,7 +187,7 @@ class _EditBusstopState extends State<EditBusstop> {
                                           child: Image.network(
                                             'http://' +
                                                 Service.ip +
-                                                '/controlModel/showImage.php?name=' +
+                                                '/controlModel/images/member/' +
                                                 _imagecontroller.text,
                                             fit: BoxFit.fitWidth,
                                           ),

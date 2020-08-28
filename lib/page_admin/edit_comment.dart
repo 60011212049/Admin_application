@@ -216,7 +216,7 @@ class _EditCommentState extends State<EditComment> {
                                         child: Image.network(
                                           'http://' +
                                               Service.ip +
-                                              '/controlModel/showImage.php?name=' +
+                                              '/controlModel/images/member/' +
                                               _imagecontroller.text,
                                           fit: BoxFit.fitWidth,
                                         ),

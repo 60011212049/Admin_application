@@ -14,6 +14,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:splashscreen/splashscreen.dart';
 import 'package:toast/toast.dart';
 
 class LogingPage extends StatefulWidget {
@@ -27,6 +28,7 @@ class _LogingPageState extends State<LogingPage> {
   String radioButtonItem = '';
   var status = {};
   List jsonData;
+  bool login = false;
   bool _isHidden = true;
   bool _isLoading = false;
   var _passwordcontroller = TextEditingController();
@@ -38,30 +40,32 @@ class _LogingPageState extends State<LogingPage> {
   @override
   void initState() {
     super.initState();
-    checkLogin();
+    // checkLogin();
   }
 
-  void checkLogin() async {
-    logindata = await SharedPreferences.getInstance();
-    var idToken = logindata.getInt('tokenId');
-    var typeToken = logindata.getString('tokenType');
-    print(idToken.toString() + ' ' + typeToken.toString());
-    if (idToken != null && typeToken.toString() == 'admin') {
-      Navigator.pushReplacement(
-        context,
-        new MaterialPageRoute(
-          builder: (context) => AdminHome(),
-        ),
-      );
-    } else if (idToken != null && typeToken.toString() == 'driver') {
-      Navigator.pushReplacement(
-        context,
-        new MaterialPageRoute(
-          builder: (context) => BusdriverHome(),
-        ),
-      );
-    } else {}
-  }
+  // void checkLogin() async {
+  //   logindata = await SharedPreferences.getInstance();
+  //   var idToken = logindata.getInt('tokenId');
+  //   var typeToken = logindata.getString('tokenType');
+  //   print(idToken.toString() + ' ' + typeToken.toString());
+  //   if (idToken != null && typeToken.toString() == 'admin') {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       new MaterialPageRoute(
+  //         builder: (context) => AdminHome(),
+  //       ),
+  //     );
+  //   } else if (idToken != null && typeToken.toString() == 'driver') {
+  //     Navigator.pushReplacement(
+  //       context,
+  //       new MaterialPageRoute(
+  //         builder: (context) => BusdriverHome(),
+  //       ),
+  //     );
+  //   } else {
+  //     login = true;
+  //   }
+  // }
 
   void _toggleVisibility() {
     setState(() {
@@ -70,6 +74,7 @@ class _LogingPageState extends State<LogingPage> {
   }
 
   Future loginAdmin() async {
+    logindata = await SharedPreferences.getInstance();
     status['status'] = 'getProfile';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -105,6 +110,7 @@ class _LogingPageState extends State<LogingPage> {
   }
 
   Future loginBusDriver() async {
+    logindata = await SharedPreferences.getInstance();
     status['status'] = 'getProfile';
     status['username'] = _usernamecontroller.text;
     status['password'] = _passwordcontroller.text;
@@ -126,6 +132,7 @@ class _LogingPageState extends State<LogingPage> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
+        print(busdriver[0].did);
         logindata.setInt('tokenId', int.parse(busdriver[0].did));
         logindata.setString('tokenType', 'driver');
         Navigator.pushReplacement(

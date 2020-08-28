@@ -404,7 +404,7 @@ class _CommentPageState extends State<CommentPageAdmin> {
                                                 child: Image.network(
                                                   'http://' +
                                                       Service.ip +
-                                                      '/controlModel/showImage.php?name=' +
+                                                      '/controlModel/images/member/' +
                                                       commentForSearch[index]
                                                           .cImage,
                                                   fit: BoxFit.fitHeight,

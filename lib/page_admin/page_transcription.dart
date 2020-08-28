@@ -184,7 +184,7 @@ class _TranscriptionState extends State<Transcription> {
                                   cells: [
                                     DataCell(
                                       Container(
-                                        width: ScreenUtil().setWidth(100),
+                                        width: ScreenUtil().setWidth(130),
                                         child: Text(
                                           admin
                                               .firstWhere((element) =>

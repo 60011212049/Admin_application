@@ -20,11 +20,11 @@ class ManageBusstop extends StatefulWidget {
 }
 
 class _ManageBusstopState extends State<ManageBusstop> {
+  List<BusstopModel> busstop = List<BusstopModel>();
+  List<BusstopModel> busForSearch = List<BusstopModel>();
   TextEditingController editcontroller = TextEditingController();
   var status = {};
   bool isSearch = false;
-  List<BusstopModel> busstop = List<BusstopModel>();
-  List<BusstopModel> busForSearch = List<BusstopModel>();
 
   @override
   void initState() {
