@@ -230,36 +230,57 @@ class _ManageAdminState extends State<ManageAdmin> {
                       ),
                       trailing: Wrap(
                         children: <Widget>[
-                          IconButton(
-                            icon: Icon(
-                              Icons1.edit,
-                              color: Colors.blue,
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        EditAdmin(adminForSearch[index]),
-                                  )).then((value) => getDataAdmin());
-                            },
-                          ),
-                          idAdmin != adminForSearch[index].aid
+                          idAdmin == adminForSearch[index].aid
                               ? IconButton(
                                   icon: Icon(
-                                    Icons1.delete,
-                                    color: Colors.red,
+                                    Icons1.edit,
+                                    color: Colors.blue,
                                   ),
                                   onPressed: () {
-                                    deleteAdmin(adminForSearch[index].aid);
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EditAdmin(adminForSearch[index]),
+                                        )).then((value) => getDataAdmin());
                                   },
                                 )
                               : IconButton(
                                   icon: Icon(
-                                    Icons1.delete,
+                                    Icons1.edit,
                                     color: Colors.white,
                                   ),
-                                )
+                                ),
+                          // IconButton(
+                          //   icon: Icon(
+                          //     Icons1.edit,
+                          //     color: Colors.blue,
+                          //   ),
+                          //   onPressed: () {
+                          //     Navigator.push(
+                          //         context,
+                          //         MaterialPageRoute(
+                          //           builder: (context) =>
+                          //               EditAdmin(adminForSearch[index]),
+                          //         )).then((value) => getDataAdmin());
+                          //   },
+                          // ),
+                          // idAdmin != adminForSearch[index].aid
+                          //     ? IconButton(
+                          //         icon: Icon(
+                          //           Icons1.delete,
+                          //           color: Colors.red,
+                          //         ),
+                          //         onPressed: () {
+                          //           deleteAdmin(adminForSearch[index].aid);
+                          //         },
+                          //       )
+                          //     : IconButton(
+                          //         icon: Icon(
+                          //           Icons1.delete,
+                          //           color: Colors.white,
+                          //         ),
+                          //       )
                         ],
                       ),
                     ),
