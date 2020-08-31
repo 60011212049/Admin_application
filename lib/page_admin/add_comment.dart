@@ -23,6 +23,7 @@ class _AddCommentState extends State<AddComment> {
   var _detailcontroller = TextEditingController();
   File image;
   var fileName;
+  bool userB = false;
 
   Future addTransciption(String id) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -170,7 +171,23 @@ class _AddCommentState extends State<AddComment> {
                         style: TextStyle(
                           fontSize: ScreenUtil().setSp(50),
                         ),
+                        onChanged: (value) {
+                          if (value.isNotEmpty) {
+                            userB = false;
+                          }
+                          setState(() {});
+                        },
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                              width: 2,
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20.0)),
+                          ),
+                          errorStyle: TextStyle(fontSize: 16),
+                          errorText: userB == true ? 'กรุณากรอกชื่อ' : null,
                           labelText: 'ชื่อเล่น',
                           filled: true,
                           fillColor: Colors.white,
@@ -298,16 +315,20 @@ class _AddCommentState extends State<AddComment> {
                               ),
                             ),
                             onPressed: () async {
-                              print(_namecontroller.text);
-                              print(_detailcontroller.text);
-                              try {
-                                if (image == null) {
-                                  sentDataComment();
-                                } else {
-                                  final Map<String, dynamic> response =
-                                      await _uploadImage();
-                                }
-                              } catch (e) {}
+                              if (_namecontroller.text.isEmpty) {
+                                userB = true;
+                              }
+                              setState(() {});
+                              if (userB == false) {
+                                try {
+                                  if (image == null) {
+                                    sentDataComment();
+                                  } else {
+                                    final Map<String, dynamic> response =
+                                        await _uploadImage();
+                                  }
+                                } catch (e) {}
+                              }
                             },
                           ),
                         ),

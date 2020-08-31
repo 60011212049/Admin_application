@@ -30,6 +30,7 @@ class _AddBusstopState extends State<AddBusstop> {
   LocationData locatNow;
   File image;
   var bit;
+  bool nameB = false, latB = false, lngB = false;
 
   @override
   void initState() {
@@ -94,10 +95,8 @@ class _AddBusstopState extends State<AddBusstop> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     if (response.statusCode == 200) {
       if (response.body.toString() == 'Bad') {
-        setState(() {
-          Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
-              duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-        });
+        Toast.show("ไม่สามารถเพิ่มข้อมูลได้", context,
+            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
       } else {
         Toast.show("เพิ่มข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
@@ -253,7 +252,25 @@ class _AddBusstopState extends State<AddBusstop> {
                         Container(
                           child: TextField(
                             style: TextStyle(fontSize: 22.0, height: 1.0),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                nameB = false;
+                              }
+                              setState(() {});
+                            },
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              errorStyle: TextStyle(fontSize: 16),
+                              errorText: nameB == true
+                                  ? 'กรุณากรอกชื่อจุดรับส่ง'
+                                  : null,
                               labelText: 'ชื่อจุดรับส่ง',
                               filled: true,
                               fillColor: Colors.white,
@@ -279,7 +296,24 @@ class _AddBusstopState extends State<AddBusstop> {
                               fontSize: 22.0,
                               height: 1.0,
                             ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                latB = false;
+                              }
+                              setState(() {});
+                            },
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              errorStyle: TextStyle(fontSize: 16),
+                              errorText:
+                                  latB == true ? 'กรุณากรอกละติจูด' : null,
                               labelText: 'ละติจูด',
                               filled: true,
                               fillColor: Colors.white,
@@ -305,7 +339,24 @@ class _AddBusstopState extends State<AddBusstop> {
                               fontSize: 22.0,
                               height: 1.0,
                             ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                lngB = false;
+                              }
+                              setState(() {});
+                            },
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              errorStyle: TextStyle(fontSize: 16),
+                              errorText:
+                                  lngB == true ? 'กรุณากรอกลองจิจูด' : null,
                               labelText: 'ลองจิจูด',
                               filled: true,
                               fillColor: Colors.white,
@@ -368,14 +419,32 @@ class _AddBusstopState extends State<AddBusstop> {
                               ),
                             ),
                             onPressed: () async {
-                              try {
-                                if (image == null) {
-                                  _sentDataBusstop();
-                                } else {
-                                  final Map<String, dynamic> response =
-                                      await _uploadImage();
-                                }
-                              } catch (e) {}
+                              if (_namecontroller.text.isEmpty) {
+                                nameB = true;
+                              }
+                              if (_latitudecontroller.text.isEmpty) {
+                                latB = true;
+                              }
+                              if (_longitudecontroller.text.isEmpty) {
+                                lngB = true;
+                              }
+                              if (nameB == false &&
+                                  latB == false &&
+                                  lngB == false) {
+                                try {
+                                  if (image == null) {
+                                    _sentDataBusstop();
+                                  } else {
+                                    final Map<String, dynamic> response =
+                                        await _uploadImage();
+                                  }
+                                } catch (e) {}
+                              } else {
+                                Toast.show("กรุณากรอกข้อมูลให้ครบ", context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
+                                setState(() {});
+                              }
                             },
                           ),
                         ),

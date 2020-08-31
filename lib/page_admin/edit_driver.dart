@@ -47,6 +47,13 @@ class _EditBusDriverState extends State<EditBusDriver> {
   DateTime _dataTime = DateTime.now();
   List<BusdriverModel> busEdit = List<BusdriverModel>();
   List<BusModel> bus = List<BusModel>();
+  bool userB = false,
+      passB = false,
+      nameB = false,
+      genB = false,
+      emailB = false,
+      dateB = false,
+      tellB = false;
 
   _EditBusDriverState(BusdriverModel x) {
     print(x.dUsername);
@@ -382,7 +389,25 @@ class _EditBusDriverState extends State<EditBusDriver> {
                             child: Container(
                               child: TextField(
                                 style: TextStyle(fontSize: 22.0, height: 1.0),
+                                onChanged: (value) {
+                                  if (value.isNotEmpty) {
+                                    userB = false;
+                                  }
+                                  setState(() {});
+                                },
                                 decoration: InputDecoration(
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.red,
+                                      width: 2,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                  errorStyle: TextStyle(fontSize: 16),
+                                  errorText: userB == true
+                                      ? 'กรุณากรอกชื่อผู้ใช้งาน'
+                                      : null,
                                   labelText: 'ชื่อผู้ใช้งาน',
                                   filled: true,
                                   fillColor: Colors.white,
@@ -405,7 +430,24 @@ class _EditBusDriverState extends State<EditBusDriver> {
                           child: Container(
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  passB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText:
+                                    passB == true ? 'กรุณากรอกรหัสผ่าน' : null,
                                 labelText: 'รหัสผ่าน',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -428,7 +470,25 @@ class _EditBusDriverState extends State<EditBusDriver> {
                           child: Container(
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  nameB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText: nameB == true
+                                    ? 'กรุณากรอกชื่อ นามสกุล'
+                                    : null,
                                 labelText: 'ชื่อ นามสกุล',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -529,7 +589,24 @@ class _EditBusDriverState extends State<EditBusDriver> {
                           child: Container(
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  emailB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText:
+                                    emailB == true ? 'กรุณากรอกอีเมลล์' : null,
                                 labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -620,7 +697,24 @@ class _EditBusDriverState extends State<EditBusDriver> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               maxLength: 10,
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  tellB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText:
+                                    tellB == true ? 'กรุณากรอกเบอร์โทร' : null,
                                 labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -701,14 +795,39 @@ class _EditBusDriverState extends State<EditBusDriver> {
                               ),
                             ),
                             onPressed: () async {
-                              try {
-                                if (image == null) {
-                                  _sentDataBusDriver();
-                                } else {
-                                  final Map<String, dynamic> response =
-                                      await _uploadImage();
-                                }
-                              } catch (e) {}
+                              if (_usernamecontroller.text.isEmpty) {
+                                userB = true;
+                              }
+                              if (_passwordcontroller.text.isEmpty) {
+                                passB = true;
+                              }
+                              if (_namecontroller.text.isEmpty) {
+                                nameB = true;
+                              }
+                              if (id != 1 && id != 2) {
+                                id = 3;
+                              }
+                              if (_emailcontroller.text.isEmpty) {
+                                emailB = true;
+                              }
+                              if (_tellcontroller.text.isEmpty) {
+                                tellB = true;
+                              }
+                              if (userB == false &&
+                                  passB == false &&
+                                  nameB == false &&
+                                  emailB == false &&
+                                  tellB == false) {
+                                try {
+                                  if (image == null) {
+                                    _sentDataBusDriver();
+                                  } else {
+                                    final Map<String, dynamic> response =
+                                        await _uploadImage();
+                                  }
+                                } catch (e) {}
+                              }
+                              setState(() {});
                             },
                           ),
                         ),

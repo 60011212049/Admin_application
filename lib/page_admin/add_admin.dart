@@ -21,6 +21,7 @@ class _AddAdminState extends State<AddAdmin> {
   var _emailcontroller = TextEditingController();
   var _tellcontroller = TextEditingController();
   List<AdminModel> admin = List<AdminModel>();
+  bool userB = false, passB = false, emailB = false, tellB = false;
 
   Future<Null> addTransciption() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -121,7 +122,25 @@ class _AddAdminState extends State<AddAdmin> {
                             child: Container(
                               child: TextField(
                                 style: TextStyle(fontSize: 22.0, height: 1.0),
+                                onChanged: (value) {
+                                  if (value.isNotEmpty) {
+                                    userB = false;
+                                  }
+                                  setState(() {});
+                                },
                                 decoration: InputDecoration(
+                                  errorBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.red,
+                                      width: 2,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20.0)),
+                                  ),
+                                  errorStyle: TextStyle(fontSize: 16),
+                                  errorText: userB == true
+                                      ? 'กรุณากรอกชื่อผู้ใช้งาน'
+                                      : null,
                                   labelText: 'ชื่อผู้ใช้งาน',
                                   filled: true,
                                   fillColor: Colors.white,
@@ -144,7 +163,24 @@ class _AddAdminState extends State<AddAdmin> {
                           child: Container(
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  passB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText:
+                                    passB == true ? 'กรุณากรอกรหัสผ่าน' : null,
                                 labelText: 'รหัสผ่าน',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -168,7 +204,24 @@ class _AddAdminState extends State<AddAdmin> {
                           child: Container(
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  emailB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText:
+                                    emailB == true ? 'กรุณากรอกอีเมลล์' : null,
                                 labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -192,7 +245,24 @@ class _AddAdminState extends State<AddAdmin> {
                             child: TextField(
                               style: TextStyle(fontSize: 22.0, height: 1.0),
                               maxLength: 10,
+                              onChanged: (value) {
+                                if (value.isNotEmpty) {
+                                  tellB = false;
+                                  setState(() {});
+                                }
+                              },
                               decoration: InputDecoration(
+                                errorBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.0)),
+                                ),
+                                errorStyle: TextStyle(fontSize: 16),
+                                errorText:
+                                    tellB == true ? 'กรุณากรอกเบอร์โทร' : null,
                                 labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -206,6 +276,7 @@ class _AddAdminState extends State<AddAdmin> {
                                         Radius.circular(20.0))),
                                 prefixIcon: Icon(Icons1.phone_1),
                               ),
+                              keyboardType: TextInputType.phone,
                               controller: _tellcontroller,
                             ),
                           ),
@@ -231,7 +302,28 @@ class _AddAdminState extends State<AddAdmin> {
                               ),
                             ),
                             onPressed: () async {
-                              sentDataAdmin();
+                              if (_usernamecontroller.text.isEmpty) {
+                                userB = true;
+                              }
+                              if (_passwordcontroller.text.isEmpty) {
+                                passB = true;
+                              }
+                              if (_emailcontroller.text.isEmpty) {
+                                emailB = true;
+                              }
+                              if (_tellcontroller.text.isEmpty) {
+                                tellB = true;
+                              }
+                              if (userB == false &&
+                                  passB == false &&
+                                  emailB == false &&
+                                  tellB == false) {
+                                sentDataAdmin();
+                              } else
+                                Toast.show("กรุณากรอกข้อมูลให้ครบ", context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
+                              setState(() {});
                             },
                           ),
                         ),

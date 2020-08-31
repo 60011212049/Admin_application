@@ -22,6 +22,7 @@ class _AddBusScheduleState extends State<AddBusSchedule> {
   TextEditingController timecontroller = TextEditingController();
   TextEditingController buscontroller = TextEditingController();
   List<BusModel> listBus = List<BusModel>();
+  String checkBus = 'yes';
 
   @override
   void initState() {
@@ -187,52 +188,79 @@ class _AddBusScheduleState extends State<AddBusSchedule> {
                     ],
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                  child: Wrap(
-                    children: <Widget>[
-                      Container(
-                        height: ScreenUtil().setHeight(180),
-                        width: ScreenUtil().setWidth(600),
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.grey[600],
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(20.0),
-                            ),
-                            color: Colors.white),
-                        child: InkWell(
-                          onTap: () {
-                            showBus();
-                          },
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 11),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons1.directions_bus,
-                                    color: Colors.grey[500],
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+                      child: Wrap(
+                        children: <Widget>[
+                          Container(
+                            height: ScreenUtil().setHeight(180),
+                            width: ScreenUtil().setWidth(600),
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  width: checkBus == 'yes' ? 1 : 3,
+                                  color: checkBus == 'yes'
+                                      ? Colors.grey[600]
+                                      : Colors.red,
+                                ),
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20.0),
+                                ),
+                                color: Colors.white),
+                            child: InkWell(
+                              onTap: () {
+                                showBus();
+                              },
+                              child: Center(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 11),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons1.directions_bus,
+                                        color: Colors.grey[500],
+                                      ),
+                                      Container(
+                                        width: 12,
+                                      ),
+                                      Text(
+                                        'รถราง ' + buscontroller.text,
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                          fontSize: 22.0,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Container(
-                                    width: 12,
-                                  ),
-                                  Text(
-                                    'รถราง ' + buscontroller.text,
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
-                                      fontSize: 22.0,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(45, 0, 0, 0),
+                      child: checkBus == 'no'
+                          ? Text(
+                              'กรุณาเลือกรถราง',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 20.0,
+                              ),
+                            )
+                          : Text(
+                              '',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 20.0,
+                              ),
+                            ),
+                    )
+                  ],
                 ),
                 SizedBox(
                   height: ScreenUtil().setSp(30),
@@ -255,7 +283,15 @@ class _AddBusScheduleState extends State<AddBusSchedule> {
                       ),
                     ),
                     onPressed: () async {
-                      sentDataBusSchedule();
+                      if (checkBus == 'yes' && buscontroller.text.isEmpty) {
+                        checkBus = 'no';
+                        Toast.show("กรุณากรอกข้อมูลให้ครบ", context,
+                            duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                        setState(() {});
+                      } else if ((checkBus == 'yes' &&
+                          buscontroller.text.isNotEmpty)) {
+                        sentDataBusSchedule();
+                      }
                     },
                   ),
                 ),
@@ -270,6 +306,7 @@ class _AddBusScheduleState extends State<AddBusSchedule> {
   void _setValue(String value) {
     setState(() {
       buscontroller.text = value;
+      checkBus = 'yes';
     });
   }
 

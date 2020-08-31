@@ -25,6 +25,7 @@ class _AddBusState extends State<AddBus> {
   @override
   void initState() {
     super.initState();
+    statuscontroller.text = 'พร้อมใช้งาน';
     getDataBus();
   }
 
