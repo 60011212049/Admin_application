@@ -39,6 +39,7 @@ class _EditBusstopState extends State<EditBusstop> {
   LocationData locatNow;
   BusstopModel busstop;
   bool loadImage = false;
+  bool nameB = false, latB = false, lngB = false;
 
   _EditBusstopState(BusstopModel x) {
     this.busstop = x;
@@ -293,7 +294,25 @@ class _EditBusstopState extends State<EditBusstop> {
                         Container(
                           child: TextField(
                             style: TextStyle(fontSize: 22.0, height: 1.0),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                nameB = false;
+                              }
+                              setState(() {});
+                            },
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              errorStyle: TextStyle(fontSize: 16),
+                              errorText: nameB == true
+                                  ? 'กรุณากรอกชื่อจุดรับส่ง'
+                                  : null,
                               labelText: 'ชื่อจุดรับส่ง',
                               filled: true,
                               fillColor: Colors.white,
@@ -319,7 +338,24 @@ class _EditBusstopState extends State<EditBusstop> {
                               fontSize: 22.0,
                               height: 1.0,
                             ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                latB = false;
+                              }
+                              setState(() {});
+                            },
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              errorStyle: TextStyle(fontSize: 16),
+                              errorText:
+                                  latB == true ? 'กรุณากรอกละติจูด' : null,
                               labelText: 'ละติจูด',
                               filled: true,
                               fillColor: Colors.white,
@@ -345,7 +381,24 @@ class _EditBusstopState extends State<EditBusstop> {
                               fontSize: 22.0,
                               height: 1.0,
                             ),
+                            onChanged: (value) {
+                              if (value.isNotEmpty) {
+                                lngB = false;
+                              }
+                              setState(() {});
+                            },
                             decoration: InputDecoration(
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                              ),
+                              errorStyle: TextStyle(fontSize: 16),
+                              errorText:
+                                  lngB == true ? 'กรุณากรอกลองจิจูด' : null,
                               labelText: 'ลองจิจูด',
                               filled: true,
                               fillColor: Colors.white,
@@ -408,14 +461,32 @@ class _EditBusstopState extends State<EditBusstop> {
                               ),
                             ),
                             onPressed: () async {
-                              try {
-                                if (image == null) {
-                                  _sentDataBusstop();
-                                } else {
-                                  final Map<String, dynamic> response =
-                                      await _uploadImage();
-                                }
-                              } catch (e) {}
+                              if (_namecontroller.text.isEmpty) {
+                                nameB = true;
+                              }
+                              if (_latitudecontroller.text.isEmpty) {
+                                latB = true;
+                              }
+                              if (_longitudecontroller.text.isEmpty) {
+                                lngB = true;
+                              }
+                              if (nameB == false &&
+                                  latB == false &&
+                                  lngB == false) {
+                                try {
+                                  if (image == null) {
+                                    _sentDataBusstop();
+                                  } else {
+                                    final Map<String, dynamic> response =
+                                        await _uploadImage();
+                                  }
+                                } catch (e) {}
+                              } else {
+                                Toast.show("กรุณากรอกข้อมูลให้ครบ", context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
+                                setState(() {});
+                              }
                             },
                           ),
                         ),
