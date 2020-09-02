@@ -13,6 +13,7 @@ String statusWorkModelToJson(List<StatusWorkModel> data) =>
 
 class StatusWorkModel {
   StatusWorkModel({
+    this.idStwork,
     this.did,
     this.inDate,
     this.outDate,
@@ -20,25 +21,28 @@ class StatusWorkModel {
     this.outSid,
   });
 
+  String idStwork;
   String did;
-  String inDate;
-  String outDate;
+  DateTime inDate;
+  DateTime outDate;
   String inSid;
   String outSid;
 
   factory StatusWorkModel.fromJson(Map<String, dynamic> json) =>
       StatusWorkModel(
+        idStwork: json["id_stwork"],
         did: json["Did"],
-        inDate: json["in_date"],
-        outDate: json["out_date"],
+        inDate: DateTime.parse(json["in_date"]),
+        outDate: DateTime.parse(json["out_date"]),
         inSid: json["in_Sid"],
         outSid: json["out_Sid"],
       );
 
   Map<String, dynamic> toJson() => {
+        "id_stwork": idStwork,
         "Did": did,
-        "in_date": inDate,
-        "out_date": outDate,
+        "in_date": inDate.toIso8601String(),
+        "out_date": outDate.toIso8601String(),
         "in_Sid": inSid,
         "out_Sid": outSid,
       };

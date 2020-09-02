@@ -49,6 +49,7 @@ dependencies:
   chips_choice: ^1.2.0
   splashscreen: ^1.2.0
   email_validator: '^1.0.0'
+  datetime_picker_formfield: ^1.0.0
 
 
 dev_dependencies:
