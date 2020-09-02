@@ -99,22 +99,33 @@ class _SplashPageState extends State<SplashPage> {
   initScreen(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.grey[100],
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("asset/icons/2.png"),
+            fit: BoxFit.fill,
+            alignment: Alignment.bottomCenter,
+          ),
+          color: Colors.grey[700],
+        ),
         child: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Container(
-                // color: Colors.grey,
-                width: ScreenUtil().setWidth(500),
-                child: Image.asset("asset/icons/msubuslogo.png"),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 200, 0, 0),
+                child: Container(
+                  height: 200,
+                  width: 200,
+                  child: Image.asset(
+                    "asset/icons/msubusnew.png",
+                    fit: BoxFit.fill,
+                  ),
+                ),
               ),
-              Padding(padding: EdgeInsets.only(top: 20.0)),
               // Text(
               //   "Splash Screen",
               //   style: TextStyle(fontSize: 20.0, color: Colors.white),
               // ),
-              Padding(padding: EdgeInsets.only(top: 20.0)),
               // CircularProgressIndicator(
               //   backgroundColor: Colors.white,
               //   strokeWidth: 1.5,

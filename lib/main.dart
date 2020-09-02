@@ -64,9 +64,8 @@ class _HomePageState extends State<HomePage> {
         style: new TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
       ),
       navigateAfterSeconds: LogingPage(),
-      image: new Image.network(
-          'https://flutter.io/images/catalog-widget-placeholder.png'),
-      backgroundColor: Colors.white,
+      image: new Image.asset('asset/icons/msubusnew.png'),
+      imageBackground: AssetImage('asset/icons/2.png'),
       styleTextUnderTheLoader: new TextStyle(),
       photoSize: 100.0,
       onClick: () => print("Flutter Egypt"),

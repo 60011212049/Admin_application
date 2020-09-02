@@ -40,32 +40,7 @@ class _LogingPageState extends State<LogingPage> {
   @override
   void initState() {
     super.initState();
-    // checkLogin();
   }
-
-  // void checkLogin() async {
-  //   logindata = await SharedPreferences.getInstance();
-  //   var idToken = logindata.getInt('tokenId');
-  //   var typeToken = logindata.getString('tokenType');
-  //   print(idToken.toString() + ' ' + typeToken.toString());
-  //   if (idToken != null && typeToken.toString() == 'admin') {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       new MaterialPageRoute(
-  //         builder: (context) => AdminHome(),
-  //       ),
-  //     );
-  //   } else if (idToken != null && typeToken.toString() == 'driver') {
-  //     Navigator.pushReplacement(
-  //       context,
-  //       new MaterialPageRoute(
-  //         builder: (context) => BusdriverHome(),
-  //       ),
-  //     );
-  //   } else {
-  //     login = true;
-  //   }
-  // }
 
   void _toggleVisibility() {
     setState(() {
@@ -172,7 +147,7 @@ class _LogingPageState extends State<LogingPage> {
                 padding: EdgeInsets.only(
                     top: 20.0, right: 20.0, left: 20.0, bottom: 10.0),
                 child: Image.asset(
-                  'asset/icons/msubuslogo.png',
+                  'asset/icons/msubusnew.png',
                   height: 200,
                   width: 200,
                 ),
@@ -192,55 +167,65 @@ class _LogingPageState extends State<LogingPage> {
                             TextStyle(fontSize: 23, color: Colors.yellow[700]),
                       ),
               ),
-              Container(
-                width: 260,
-                height: 60,
-                decoration: BoxDecoration(
-                    border: Border.all(),
-                    borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                    color: Colors.white),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Radio(
-                      value: 1,
-                      groupValue: id,
-                      onChanged: (val) {
-                        setState(() {
-                          radioButtonItem = 'คนขับรถ';
-                          id = 1;
-                        });
-                      },
+              Material(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20.0),
+                ),
+                elevation: 15.0,
+                shadowColor: Colors.black,
+                child: Container(
+                  width: 260,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(15.0),
                     ),
-                    Text(
-                      'คนขับรถ',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Quark',
+                    color: Colors.white,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Radio(
+                        value: 1,
+                        groupValue: id,
+                        onChanged: (val) {
+                          setState(() {
+                            radioButtonItem = 'คนขับรถ';
+                            id = 1;
+                          });
+                        },
                       ),
-                    ),
-                    Radio(
-                      value: 2,
-                      groupValue: id,
-                      onChanged: (val) {
-                        setState(() {
-                          radioButtonItem = 'ผู้ดูแลระบบ';
-                          id = 2;
-                        });
-                      },
-                    ),
-                    Text(
-                      'ผู้ดูแลระบบ',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 22.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'Quark',
+                      Text(
+                        'คนขับรถ',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Quark',
+                        ),
                       ),
-                    ),
-                  ],
+                      Radio(
+                        value: 2,
+                        groupValue: id,
+                        onChanged: (val) {
+                          setState(() {
+                            radioButtonItem = 'ผู้ดูแลระบบ';
+                            id = 2;
+                          });
+                        },
+                      ),
+                      Text(
+                        'ผู้ดูแลระบบ',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 22.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Quark',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 20.0),
@@ -248,6 +233,7 @@ class _LogingPageState extends State<LogingPage> {
                 minWidth: 300.0,
                 height: 60.0,
                 child: RaisedButton(
+                  elevation: 12,
                   shape: new RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(23.0),
                   ),
@@ -307,32 +293,41 @@ class _LogingPageState extends State<LogingPage> {
         padding:
             EdgeInsets.only(top: 10.0, right: 0.0, left: 0.0, bottom: 10.0),
         child: Container(
-          child: TextField(
-            style: TextStyle(fontSize: 22.0),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              hintText: hintText,
-              hintStyle: TextStyle(
-                color: Colors.grey,
-                fontSize: 22.0,
+          child: Center(
+            child: Material(
+              borderRadius: BorderRadius.all(
+                Radius.circular(20.0),
               ),
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
-              prefixIcon: hintText == "ชื่อผู้ใช้งาน"
-                  ? Icon(Icons.email)
-                  : Icon(Icons.lock),
-              suffixIcon: hintText == "รหัสผ่าน"
-                  ? IconButton(
-                      onPressed: _toggleVisibility,
-                      icon: _isHidden
-                          ? Icon(Icons.visibility_off)
-                          : Icon(Icons.visibility),
-                    )
-                  : null,
+              elevation: 15.0,
+              shadowColor: Colors.black,
+              child: TextField(
+                style: TextStyle(fontSize: 22.0),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintText: hintText,
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 22.0,
+                  ),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0))),
+                  prefixIcon: hintText == "ชื่อผู้ใช้งาน"
+                      ? Icon(Icons.email)
+                      : Icon(Icons.lock),
+                  suffixIcon: hintText == "รหัสผ่าน"
+                      ? IconButton(
+                          onPressed: _toggleVisibility,
+                          icon: _isHidden
+                              ? Icon(Icons.visibility_off)
+                              : Icon(Icons.visibility),
+                        )
+                      : null,
+                ),
+                controller: controller,
+                obscureText: hintText == "รหัสผ่าน" ? _isHidden : false,
+              ),
             ),
-            controller: controller,
-            obscureText: hintText == "รหัสผ่าน" ? _isHidden : false,
           ),
         ));
   }
@@ -345,8 +340,8 @@ class _LogingPageState extends State<LogingPage> {
       body: Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage("asset/backgrounds/BG1.png"),
-                fit: BoxFit.fitWidth,
+                image: AssetImage("asset/icons/2.png"),
+                fit: BoxFit.fill,
                 alignment: Alignment.bottomCenter),
             color: Colors.grey[700]),
         child: _isLoading
