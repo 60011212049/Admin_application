@@ -34,7 +34,7 @@ class _ManageAdminState extends State<ManageAdmin> {
   Future getToken() async {
     SharedPreferences token = await SharedPreferences.getInstance();
     idAdmin = token.getInt('tokenId').toString();
-    print(token.getInt('tokenId'));
+    print(token.getInt('tokenId').toString() + '  id');
   }
 
   Future<Null> addTransciption(String id) async {
@@ -230,57 +230,57 @@ class _ManageAdminState extends State<ManageAdmin> {
                       ),
                       trailing: Wrap(
                         children: <Widget>[
-                          idAdmin == adminForSearch[index].aid
-                              ? IconButton(
-                                  icon: Icon(
-                                    Icons1.edit,
-                                    color: Colors.blue,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              EditAdmin(adminForSearch[index]),
-                                        )).then((value) => getDataAdmin());
-                                  },
-                                )
-                              : IconButton(
-                                  icon: Icon(
-                                    Icons1.edit,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                          // IconButton(
-                          //   icon: Icon(
-                          //     Icons1.edit,
-                          //     color: Colors.blue,
-                          //   ),
-                          //   onPressed: () {
-                          //     Navigator.push(
-                          //         context,
-                          //         MaterialPageRoute(
-                          //           builder: (context) =>
-                          //               EditAdmin(adminForSearch[index]),
-                          //         )).then((value) => getDataAdmin());
-                          //   },
-                          // ),
-                          // idAdmin != adminForSearch[index].aid
+                          // idAdmin == adminForSearch[index].aid
                           //     ? IconButton(
                           //         icon: Icon(
-                          //           Icons1.delete,
-                          //           color: Colors.red,
+                          //           Icons1.edit,
+                          //           color: Colors.blue,
                           //         ),
                           //         onPressed: () {
-                          //           deleteAdmin(adminForSearch[index].aid);
+                          //           Navigator.push(
+                          //               context,
+                          //               MaterialPageRoute(
+                          //                 builder: (context) =>
+                          //                     EditAdmin(adminForSearch[index]),
+                          //               )).then((value) => getDataAdmin());
                           //         },
                           //       )
                           //     : IconButton(
                           //         icon: Icon(
-                          //           Icons1.delete,
+                          //           Icons1.edit,
                           //           color: Colors.white,
                           //         ),
-                          //       )
+                          //       ),
+                          IconButton(
+                            icon: Icon(
+                              Icons1.edit,
+                              color: Colors.blue,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditAdmin(adminForSearch[index]),
+                                  )).then((value) => getDataAdmin());
+                            },
+                          ),
+                          idAdmin != adminForSearch[index].aid
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons1.delete,
+                                    color: Colors.red,
+                                  ),
+                                  onPressed: () {
+                                    deleteAdmin(adminForSearch[index].aid);
+                                  },
+                                )
+                              : IconButton(
+                                  icon: Icon(
+                                    Icons1.delete,
+                                    color: Colors.white,
+                                  ),
+                                )
                         ],
                       ),
                     ),

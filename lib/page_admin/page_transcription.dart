@@ -54,7 +54,7 @@ class _TranscriptionState extends State<Transcription> {
   Future<Null> getDataAdmin() async {
     adminForSearch.clear();
     var status = {};
-    status['status'] = 'show';
+    status['status'] = 'showAll';
     String jsonSt = json.encode(status);
     print(jsonSt);
     var response = await http.post(

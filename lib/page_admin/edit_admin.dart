@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/admin_model.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart' as http;
@@ -235,8 +236,9 @@ class _EditAdminState extends State<EditAdmin> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    emailB == true ? 'กรุณากรอกอีเมลล์' : null,
+                                errorText: emailB == true
+                                    ? 'กรุณากรอกอีเมลล์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -276,8 +278,9 @@ class _EditAdminState extends State<EditAdmin> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    tellB == true ? 'กรุณากรอกเบอร์โทร' : null,
+                                errorText: tellB == true
+                                    ? 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -322,10 +325,14 @@ class _EditAdminState extends State<EditAdmin> {
                               if (_passwordcontroller.text.isEmpty) {
                                 passB = true;
                               }
-                              if (_emailcontroller.text.isEmpty) {
+                              if (_emailcontroller.text.isEmpty ||
+                                  EmailValidator.validate(
+                                          _emailcontroller.text) !=
+                                      true) {
                                 emailB = true;
                               }
-                              if (_tellcontroller.text.isEmpty) {
+                              if (_tellcontroller.text.isEmpty ||
+                                  _tellcontroller.text.length != 10) {
                                 tellB = true;
                               }
                               if (userB == false &&
@@ -334,7 +341,10 @@ class _EditAdminState extends State<EditAdmin> {
                                   tellB == false) {
                                 sentDataAdmin();
                               } else
-                                setState(() {});
+                                Toast.show("กรุณากรอกข้อมูลให้ครบ", context,
+                                    duration: Toast.LENGTH_LONG,
+                                    gravity: Toast.BOTTOM);
+                              setState(() {});
                             },
                           ),
                         ),

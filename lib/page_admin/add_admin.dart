@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/admin_model.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -220,8 +221,9 @@ class _AddAdminState extends State<AddAdmin> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    emailB == true ? 'กรุณากรอกอีเมลล์' : null,
+                                errorText: emailB == true
+                                    ? 'กรุณากรอกอีเมลล์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -261,8 +263,9 @@ class _AddAdminState extends State<AddAdmin> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    tellB == true ? 'กรุณากรอกเบอร์โทร' : null,
+                                errorText: tellB == true
+                                    ? 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -308,15 +311,19 @@ class _AddAdminState extends State<AddAdmin> {
                               if (_passwordcontroller.text.isEmpty) {
                                 passB = true;
                               }
-                              if (_emailcontroller.text.isEmpty) {
+                              if (_emailcontroller.text.isEmpty ||
+                                  EmailValidator.validate(
+                                          _emailcontroller.text) !=
+                                      true) {
                                 emailB = true;
                               }
-                              if (_tellcontroller.text.isEmpty) {
+                              if (_tellcontroller.text.isEmpty ||
+                                  _tellcontroller.text.length != 10) {
                                 tellB = true;
                               }
                               if (userB == false &&
                                   passB == false &&
-                                  emailB == false &&
+                                  (emailB == false) &&
                                   tellB == false) {
                                 sentDataAdmin();
                               } else

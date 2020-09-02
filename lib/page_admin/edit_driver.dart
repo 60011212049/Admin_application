@@ -6,6 +6,7 @@ import 'package:adminapp/model/bus_model.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/model/transcription_model.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -605,8 +606,9 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    emailB == true ? 'กรุณากรอกอีเมลล์' : null,
+                                errorText: emailB == true
+                                    ? 'กรุณากรอกอีเมลล์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -713,8 +715,9 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    tellB == true ? 'กรุณากรอกเบอร์โทร' : null,
+                                errorText: tellB == true
+                                    ? 'กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'เบอร์โทร',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -729,6 +732,7 @@ class _EditBusDriverState extends State<EditBusDriver> {
                                 prefixIcon: Icon(Icons1.phone_1),
                               ),
                               controller: _tellcontroller,
+                              keyboardType: TextInputType.phone,
                             ),
                           ),
                         ),
@@ -807,10 +811,14 @@ class _EditBusDriverState extends State<EditBusDriver> {
                               if (id != 1 && id != 2) {
                                 id = 3;
                               }
-                              if (_emailcontroller.text.isEmpty) {
+                              if (_emailcontroller.text.isEmpty ||
+                                  EmailValidator.validate(
+                                          _emailcontroller.text) !=
+                                      true) {
                                 emailB = true;
                               }
-                              if (_tellcontroller.text.isEmpty) {
+                              if (_tellcontroller.text.isEmpty ||
+                                  _tellcontroller.text.length != 10) {
                                 tellB = true;
                               }
                               if (userB == false &&

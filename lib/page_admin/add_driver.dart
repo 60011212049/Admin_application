@@ -5,6 +5,7 @@ import 'package:adminapp/custom_icons.dart';
 import 'package:adminapp/model/bus_model.dart';
 import 'package:adminapp/model/busdriver_model.dart';
 import 'package:adminapp/service/service.dart';
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -130,7 +131,7 @@ class _AddBusDriverState extends State<AddBusDriver> {
               duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         });
       } else {
-        Toast.show("แก้ไขข้อมูลสำเร็จ", context,
+        Toast.show("เพิ่มข้อมูลสำเร็จ", context,
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         bit = '';
         Navigator.pop(context);
@@ -502,8 +503,9 @@ class _AddBusDriverState extends State<AddBusDriver> {
                                       BorderRadius.all(Radius.circular(20.0)),
                                 ),
                                 errorStyle: TextStyle(fontSize: 16),
-                                errorText:
-                                    emailB == true ? 'กรุณากรอกอีเมลล์' : null,
+                                errorText: emailB == true
+                                    ? 'กรุณากรอกอีเมลล์ให้ถูกต้อง'
+                                    : null,
                                 labelText: 'อีเมล์',
                                 filled: true,
                                 fillColor: Colors.white,
@@ -659,10 +661,14 @@ class _AddBusDriverState extends State<AddBusDriver> {
                               if (id != 1 && id != 2) {
                                 id = 3;
                               }
-                              if (_emailcontroller.text.isEmpty) {
+                              if (_emailcontroller.text.isEmpty ||
+                                  EmailValidator.validate(
+                                          _emailcontroller.text) !=
+                                      true) {
                                 emailB = true;
                               }
-                              if (_tellcontroller.text.isEmpty) {
+                              if (_tellcontroller.text.isEmpty ||
+                                  _tellcontroller.text.length != 10) {
                                 tellB = true;
                               }
                               if (userB == false &&

@@ -44,6 +44,13 @@ class _EditBusDriverState extends State<BusDriverEdit> {
   DateTime _dataTime = DateTime.now();
   List<BusdriverModel> busEdit = List<BusdriverModel>();
   List<BusModel> bus = List<BusModel>();
+  bool userB = false,
+      passB = false,
+      nameB = false,
+      genB = false,
+      emailB = false,
+      dateB = false,
+      tellB = false;
 
   _EditBusDriverState(BusdriverModel x) {
     this.idPro = x.did;
@@ -211,51 +218,7 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                       width: 320,
                       child: Wrap(
                         children: <Widget>[
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              (image != null)
-                                  ? Center(
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxHeight: 230,
-                                        ),
-                                        child: Image.file(
-                                          image,
-                                          fit: BoxFit.fill,
-                                        ),
-                                      ),
-                                    )
-                                  : (_imagecontroller.text != '')
-                                      ? Center(
-                                          child: ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                              maxWidth: 300,
-                                              maxHeight: 200,
-                                            ),
-                                            child: Image.network(
-                                              'http://' +
-                                                  Service.ip +
-                                                  '/controlModel/images/member/' +
-                                                  _imagecontroller.text,
-                                              fit: BoxFit.fitWidth,
-                                            ),
-                                          ),
-                                        )
-                                      : Center(
-                                          child: Padding(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                5, 10, 5, 10),
-                                            child: CircleAvatar(
-                                              backgroundImage: ExactAssetImage(
-                                                  'asset/icons/student.png'),
-                                              radius: 110,
-                                            ),
-                                          ),
-                                        )
-                            ],
-                          ),
+                          columnShowImageProfile(),
                         ],
                       ),
                     ),
@@ -337,262 +300,16 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                         ),
                       ],
                     ),
-                    //******************       username         ************** */
+                    //******************       TextField input         ************** */
                     Column(
                       children: <Widget>[
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                            child: Container(
-                              child: TextField(
-                                style: TextStyle(fontSize: 22.0, height: 1.0),
-                                decoration: InputDecoration(
-                                  labelText: 'ชื่อผู้ใช้งาน',
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  hintText: 'ชื่อผู้ใช้งาน',
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 22.0,
-                                  ),
-                                  border: OutlineInputBorder(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20.0)),
-                                  ),
-                                  prefixIcon: Icon(Icons1.user_5),
-                                ),
-                                readOnly: true,
-                                controller: _usernamecontroller,
-                              ),
-                            )),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            child: TextField(
-                              style: TextStyle(fontSize: 22.0, height: 1.0),
-                              decoration: InputDecoration(
-                                labelText: 'รหัสผ่าน',
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: 'รหัสผ่าน',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 22.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0))),
-                                prefixIcon: Icon(Icons1.key_2),
-                              ),
-                              controller: _passwordcontroller,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            child: TextField(
-                              style: TextStyle(fontSize: 22.0, height: 1.0),
-                              decoration: InputDecoration(
-                                labelText: 'ชื่อ นามสกุล',
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: 'ชื่อ นามสกุล',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 22.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0))),
-                                prefixIcon: Icon(Icons.verified_user),
-                              ),
-                              readOnly: true,
-                              controller: _namecontroller,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey[600],
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                color: Colors.white),
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 12),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Icon(
-                                    Icons1.user_male,
-                                    color: Colors.grey[500],
-                                  ),
-                                  Container(
-                                    width: 12,
-                                  ),
-                                  //(_gendercontroller.text == 'male') ?
-                                  Text(
-                                    'เพศ',
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
-                                      fontSize: 22.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Quark',
-                                    ),
-                                  ),
-                                  Radio(
-                                    value: 1,
-                                    groupValue: id,
-                                  ),
-                                  Text(
-                                    'ชาย',
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
-                                      fontSize: 22.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Quark',
-                                    ),
-                                  ),
-                                  Radio(
-                                    value: 2,
-                                    groupValue: id,
-                                  ),
-                                  Text(
-                                    'หญิง',
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
-                                      fontSize: 22.0,
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: 'Quark',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        //******************       email         ************** */
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            child: TextField(
-                              style: TextStyle(fontSize: 22.0, height: 1.0),
-                              decoration: InputDecoration(
-                                labelText: 'อีเมล์',
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: 'อีเมล์',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 22.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0))),
-                                prefixIcon: Icon(Icons1.email),
-                              ),
-                              controller: _emailcontroller,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            height: 60,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey[600],
-                                ),
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                color: Colors.white),
-                            child: InkWell(
-                              onTap: () {
-                                showDatePicker(
-                                  context: context,
-                                  initialDate: _dataTime,
-                                  firstDate: DateTime(1950),
-                                  lastDate: DateTime(2030),
-                                ).then((value) {
-                                  setState(() {
-                                    if (value != null) {
-                                      _dataTime = value;
-                                    } else {
-                                      _dataTime = _dataTime;
-                                    }
-                                  });
-                                });
-                              },
-                              child: Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 11),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons1.calendar_3,
-                                        color: Colors.grey[500],
-                                      ),
-                                      Container(
-                                        width: 12,
-                                      ),
-                                      (_dataTime == null)
-                                          ? Text(
-                                              'วันเดือนปี',
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 22,
-                                              ),
-                                            )
-                                          : Text(
-                                              _dataTime.day.toString() +
-                                                  '/' +
-                                                  _dataTime.month.toString() +
-                                                  '/' +
-                                                  _dataTime.year.toString(),
-                                              style: TextStyle(
-                                                color: Colors.grey[800],
-                                                fontSize: 22,
-                                              ),
-                                            ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
-                          child: Container(
-                            child: TextField(
-                              style: TextStyle(fontSize: 22.0, height: 1.0),
-                              maxLength: 10,
-                              decoration: InputDecoration(
-                                labelText: 'เบอร์โทร',
-                                filled: true,
-                                fillColor: Colors.white,
-                                hintText: 'เบอร์โทร',
-                                hintStyle: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 22.0,
-                                ),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0))),
-                                prefixIcon: Icon(Icons1.phone_1),
-                              ),
-                              keyboardType: TextInputType.numberWithOptions(
-                                  signed: false),
-                              controller: _tellcontroller,
-                            ),
-                          ),
-                        ),
+                        textfieldUsername(),
+                        textfieldPassword(),
+                        textfieldName(),
+                        textfieldSex(),
+                        textfieldEmail(),
+                        datePicker(context),
+                        textfieldPhone(),
                         SizedBox(
                           height: 10.0,
                         ),
@@ -614,20 +331,41 @@ class _EditBusDriverState extends State<BusDriverEdit> {
                               ),
                             ),
                             onPressed: () async {
-                              try {
-                                if (image == null) {
-                                  _sentDataBusDriver();
-                                } else {
-                                  final Map<String, dynamic> response =
-                                      await _uploadImage();
-                                }
-                              } catch (e) {}
+                              if (_usernamecontroller.text.isEmpty) {
+                                userB = true;
+                              }
+                              if (_passwordcontroller.text.isEmpty) {
+                                passB = true;
+                              }
+                              if (_namecontroller.text.isEmpty) {
+                                nameB = true;
+                              }
+                              if (_emailcontroller.text.isEmpty) {
+                                emailB = true;
+                              }
+                              if (_tellcontroller.text.isEmpty) {
+                                tellB = true;
+                              }
+                              if (userB == false &&
+                                  passB == false &&
+                                  nameB == false &&
+                                  emailB == false &&
+                                  tellB == false) {
+                                try {
+                                  if (image == null) {
+                                    _sentDataBusDriver();
+                                  } else {
+                                    final Map<String, dynamic> response =
+                                        await _uploadImage();
+                                  }
+                                } catch (e) {}
+                              }
+                              setState(() {});
                             },
                           ),
                         ),
                       ],
                     ),
-                    //******************       password         ************** */
                   ],
                 ),
               );
@@ -635,6 +373,398 @@ class _EditBusDriverState extends State<BusDriverEdit> {
           ),
         ),
       ),
+    );
+  }
+
+  Padding textfieldPhone() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        child: TextField(
+          style: TextStyle(fontSize: 22.0, height: 1.0),
+          maxLength: 10,
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              tellB = false;
+              setState(() {});
+            }
+          },
+          decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            errorStyle: TextStyle(fontSize: 16),
+            errorText: tellB == true ? 'กรุณากรอกเบอร์โทร' : null,
+            labelText: 'เบอร์โทร',
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'เบอร์โทร',
+            hintStyle: TextStyle(
+              color: Colors.grey,
+              fontSize: 22.0,
+            ),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            prefixIcon: Icon(Icons1.phone_1),
+          ),
+          keyboardType: TextInputType.phone,
+          controller: _tellcontroller,
+        ),
+      ),
+    );
+  }
+
+  Padding datePicker(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey[600],
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(20.0),
+            ),
+            color: Colors.white),
+        child: InkWell(
+          onTap: () {
+            showDatePicker(
+              context: context,
+              initialDate: _dataTime,
+              firstDate: DateTime(1950),
+              lastDate: DateTime(2030),
+            ).then((value) {
+              setState(() {
+                if (value != null) {
+                  _dataTime = value;
+                } else {
+                  _dataTime = _dataTime;
+                }
+              });
+            });
+          },
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 11),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons1.calendar_3,
+                    color: Colors.grey[500],
+                  ),
+                  Container(
+                    width: 12,
+                  ),
+                  (_dataTime == null)
+                      ? Text(
+                          'วันเดือนปี',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 22,
+                          ),
+                        )
+                      : Text(
+                          _dataTime.day.toString() +
+                              '/' +
+                              _dataTime.month.toString() +
+                              '/' +
+                              _dataTime.year.toString(),
+                          style: TextStyle(
+                            color: Colors.grey[800],
+                            fontSize: 22,
+                          ),
+                        ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding textfieldEmail() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        child: TextField(
+          style: TextStyle(fontSize: 22.0, height: 1.0),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              emailB = false;
+              setState(() {});
+            }
+          },
+          decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            errorStyle: TextStyle(fontSize: 16),
+            errorText: emailB == true ? 'กรุณากรอกอีเมลล์' : null,
+            labelText: 'อีเมล์',
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'อีเมล์',
+            hintStyle: TextStyle(
+              color: Colors.grey,
+              fontSize: 22.0,
+            ),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            prefixIcon: Icon(Icons1.email),
+          ),
+          controller: _emailcontroller,
+        ),
+      ),
+    );
+  }
+
+  Padding textfieldSex() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey[600],
+            ),
+            borderRadius: BorderRadius.all(
+              Radius.circular(20.0),
+            ),
+            color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                Icons1.user_male,
+                color: Colors.grey[500],
+              ),
+              Container(
+                width: 12,
+              ),
+              //(_gendercontroller.text == 'male') ?
+              Text(
+                'เพศ',
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quark',
+                ),
+              ),
+              Radio(
+                value: 1,
+                groupValue: id,
+                onChanged: null,
+              ),
+              Text(
+                'ชาย',
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quark',
+                ),
+              ),
+              Radio(
+                value: 2,
+                groupValue: id,
+                onChanged: null,
+              ),
+              Text(
+                'หญิง',
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Quark',
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding textfieldName() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        child: TextField(
+          style: TextStyle(fontSize: 22.0, height: 1.0),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              nameB = false;
+              setState(() {});
+            }
+          },
+          decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            errorStyle: TextStyle(fontSize: 16),
+            errorText: nameB == true ? 'กรุณากรอกชื่อ นามสกุล' : null,
+            labelText: 'ชื่อ นามสกุล',
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'ชื่อ นามสกุล',
+            hintStyle: TextStyle(
+              color: Colors.grey,
+              fontSize: 22.0,
+            ),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            prefixIcon: Icon(Icons.verified_user),
+          ),
+          readOnly: true,
+          controller: _namecontroller,
+        ),
+      ),
+    );
+  }
+
+  Padding textfieldPassword() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        child: TextField(
+          style: TextStyle(fontSize: 22.0, height: 1.0),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              passB = false;
+              setState(() {});
+            }
+          },
+          decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            errorStyle: TextStyle(fontSize: 16),
+            errorText: passB == true ? 'กรุณากรอกรหัสผ่าน' : null,
+            labelText: 'รหัสผ่าน',
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'รหัสผ่าน',
+            hintStyle: TextStyle(
+              color: Colors.grey,
+              fontSize: 22.0,
+            ),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            prefixIcon: Icon(Icons1.key_2),
+          ),
+          controller: _passwordcontroller,
+        ),
+      ),
+    );
+  }
+
+  Padding textfieldUsername() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        child: TextField(
+          style: TextStyle(fontSize: 22.0, height: 1.0),
+          onChanged: (value) {
+            if (value.isNotEmpty) {
+              userB = false;
+            }
+            setState(() {});
+          },
+          decoration: InputDecoration(
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.red,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            errorStyle: TextStyle(fontSize: 16),
+            errorText: userB == true ? 'กรุณากรอกชื่อผู้ใช้งาน' : null,
+            labelText: 'ชื่อผู้ใช้งาน',
+            filled: true,
+            fillColor: Colors.white,
+            hintText: 'ชื่อผู้ใช้งาน',
+            hintStyle: TextStyle(
+              color: Colors.grey,
+              fontSize: 22.0,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            ),
+            prefixIcon: Icon(Icons1.user_5),
+          ),
+          readOnly: true,
+          controller: _usernamecontroller,
+        ),
+      ),
+    );
+  }
+
+  Column columnShowImageProfile() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        (image != null)
+            ? Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: 230,
+                  ),
+                  child: Image.file(
+                    image,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              )
+            : (_imagecontroller.text != '')
+                ? Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 300,
+                        maxHeight: 200,
+                      ),
+                      child: Image.network(
+                        'http://' +
+                            Service.ip +
+                            '/controlModel/images/member/' +
+                            _imagecontroller.text,
+                        fit: BoxFit.fitWidth,
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                      child: CircleAvatar(
+                        backgroundImage:
+                            ExactAssetImage('asset/icons/student.png'),
+                        radius: 110,
+                      ),
+                    ),
+                  )
+      ],
     );
   }
 

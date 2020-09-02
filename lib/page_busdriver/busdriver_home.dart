@@ -10,6 +10,7 @@ import 'package:adminapp/page/loginPage.dart';
 import 'package:adminapp/page_admin/admin_home.dart';
 import 'package:adminapp/page_admin/edit_driver.dart';
 import 'package:adminapp/page_admin/manage_driver.dart';
+import 'package:adminapp/page_busdriver/add_evaluation.dart';
 import 'package:adminapp/page_busdriver/comment_page.dart';
 import 'package:adminapp/page_busdriver/edit_busdriver.dart';
 import 'package:adminapp/page_busdriver/testCheck.dart';
@@ -166,14 +167,11 @@ class _BusdriverHomeState extends State<BusdriverHome> {
           TimeOfDay.now().minute.toString() +
           ':00';
       String jsonSt = json.encode(status);
-      //print(jsonSt);
       var response = await http.post(
           'http://' + Service.ip + '/controlModel/busposition_model.php',
           body: jsonSt,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     }
-
-    //print(response.body);
   }
 
   void getSid(String cId) async {
@@ -243,7 +241,7 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                       width: 2,
                     ),
                     Text(
-                      'Bus Tracking Project',
+                      'Bus Tracking GPS Project',
                       style: TextStyle(color: Color(0xFF3a3a3a), fontSize: 15),
                     ),
                   ],
@@ -260,10 +258,17 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    builder: (context) => AddEvaluationPage(),
+                  ),
+                );
+              } else if (value == 'Value2') {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
                     builder: (context) => BusDriverEdit(busdriverModel[0]),
                   ),
                 ).then((value) => getDataDriver());
-              } else if (value == 'Value2') {
+              } else if (value == 'Value3') {
                 SharedPreferences pref = await SharedPreferences.getInstance();
                 pref.remove('tokenId');
                 pref.remove('tokenType');
@@ -279,12 +284,19 @@ class _BusdriverHomeState extends State<BusdriverHome> {
               const PopupMenuItem<String>(
                 value: 'Value1',
                 child: ListTile(
+                  title: Text('ส่งแบบประเมินแอปพลิเคชัน'),
+                  trailing: Icon(Icons.edit_attributes),
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'Value2',
+                child: ListTile(
                   title: Text('แก้ไขข้อมูลโปรไฟล์'),
                   trailing: Icon(Icons.edit),
                 ),
               ),
               const PopupMenuItem<String>(
-                value: 'Value2',
+                value: 'Value3',
                 child: ListTile(
                   title: Text('ออกจากระบบ'),
                   trailing: Icon(Icons1.logout_2),
@@ -488,10 +500,8 @@ class _BusdriverHomeState extends State<BusdriverHome> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Image(
-                        image:
-                            Svg('asset/svg/' + listSvg[x] + '.svg', height: 60),
-                      ),
+                      Image.asset('asset/icons/' + listSvg[x] + '.png',
+                          height: 60),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5, top: 10),
                         child: Text(
