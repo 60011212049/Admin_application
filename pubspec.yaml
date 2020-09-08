@@ -56,11 +56,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-flutter_icons:
-#  image_path: "assets/images/icon-128x128.png"
-  image_path_android: "asset/icons/iconmsu.png"
-  image_path_ios: "asset/icons/iconmsu.png"
-  android: true # can specify file name here e.g. "ic_launcher"
+flutter_icons:  
+  android: true
+  ios: true
+  image_path_android: "asset/icons/bus1.png"
+  image_path_ios: "asset/icons/bus1.png"
+ # can specify file name here e.g. "ic_launcher"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
