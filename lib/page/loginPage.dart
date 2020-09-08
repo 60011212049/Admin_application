@@ -340,8 +340,8 @@ class _LogingPageState extends State<LogingPage> {
       body: Container(
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage("asset/icons/2.png"),
-                fit: BoxFit.fill,
+                image: AssetImage("asset/backgrounds/BG1.png"),
+                fit: BoxFit.fitWidth,
                 alignment: Alignment.bottomCenter),
             color: Colors.grey[700]),
         child: _isLoading

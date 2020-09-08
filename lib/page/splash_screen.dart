@@ -101,10 +101,9 @@ class _SplashPageState extends State<SplashPage> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("asset/icons/2.png"),
-            fit: BoxFit.fill,
-            alignment: Alignment.bottomCenter,
-          ),
+              image: AssetImage("asset/backgrounds/BG1.png"),
+              fit: BoxFit.fitWidth,
+              alignment: Alignment.bottomCenter),
           color: Colors.grey[700],
         ),
         child: Center(

@@ -102,7 +102,7 @@ class _ManageStatusWorkState extends State<ManageStatusWork> {
   }
 
   Future<Null> getDataBusDriver() async {
-    status['status'] = 'show';
+    status['status'] = 'showAll';
     String jsonSt = json.encode(status);
     print(jsonSt);
     var response = await http.post(

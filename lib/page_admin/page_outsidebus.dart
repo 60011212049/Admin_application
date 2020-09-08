@@ -46,7 +46,7 @@ class _PageOutSideBusState extends State<PageOutSideBus> {
   }
 
   Future<Null> getDataBusDriver() async {
-    status['status'] = 'show';
+    status['status'] = 'showAll';
     String jsonSt = json.encode(status);
     print(jsonSt);
     var response = await http.post(
