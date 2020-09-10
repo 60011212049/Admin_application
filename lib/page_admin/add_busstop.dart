@@ -390,13 +390,13 @@ class _AddBusstopState extends State<AddBusstop> {
                                         if (i + 1 > int.parse(this.idbus)) {
                                           await editIdDataBusstop(
                                               (int.parse(busstop[i].idCheck) +
-                                                      2)
+                                                      1)
                                                   .toString(),
                                               busstop[i].sid);
                                           print(busstop[i].sid +
                                               ' : ' +
                                               (int.parse(busstop[i].idCheck) +
-                                                      2)
+                                                      1)
                                                   .toString());
                                         }
                                       }
