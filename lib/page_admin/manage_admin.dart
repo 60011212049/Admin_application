@@ -280,6 +280,7 @@ class _ManageAdminState extends State<ManageAdmin> {
                                     Icons1.delete,
                                     color: Colors.white,
                                   ),
+                                  onPressed: null,
                                 )
                         ],
                       ),

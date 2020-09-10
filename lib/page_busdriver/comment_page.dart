@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:adminapp/model/comment_model.dart';
 import 'package:adminapp/page_admin/add_comment.dart';
+import 'package:adminapp/page_busdriver/add_comment_driv.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -177,7 +178,7 @@ class _CommentPageState extends State<CommentPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => AddComment(),
+                          builder: (context) => AddComDriver(),
                         )).then((value) => refreshList());
                   },
                 ),

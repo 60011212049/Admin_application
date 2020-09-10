@@ -27,6 +27,7 @@ class _ManageBusState extends State<ManageBus> {
   bool isSearch = false;
   var status = {};
   String text = '2';
+  int ch = 0;
 
   @override
   void initState() {
@@ -72,13 +73,15 @@ class _ManageBusState extends State<ManageBus> {
     listBus = jsonData.map((i) => BusModel.fromJson(i)).toList();
     listBusSearch.addAll(listBus);
     filterSearchResults(editcontroller.text);
-    setState(() {
+    ch++;
+    if (ch == 2) {
+      ch = 0;
       loadData = true;
-    });
-    return null;
+      setState(() {});
+    }
   }
 
-  Future<Null> getDataDriver() async {
+  Future getDataDriver() async {
     status['status'] = 'show';
     status['id'] = '';
     String jsonSt = json.encode(status);
@@ -88,8 +91,12 @@ class _ManageBusState extends State<ManageBus> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     listDriver = jsonData.map((i) => BusdriverModel.fromJson(i)).toList();
-    setState(() {});
-    return null;
+    ch++;
+    if (ch == 2) {
+      ch = 0;
+      loadData = true;
+      setState(() {});
+    }
   }
 
   Future<Null> deleteBus(String id) async {
@@ -112,10 +119,8 @@ class _ManageBusState extends State<ManageBus> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         addTransciption(id);
         deleteBusPosition(id);
-        setState(() {
-          getDataBus();
-          getDataDriver();
-        });
+        getDataBus();
+        getDataDriver();
       }
     } else {
       setState(() {});

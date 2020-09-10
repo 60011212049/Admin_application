@@ -61,6 +61,7 @@ flutter_icons:
   ios: true
   image_path_android: "asset/icons/bus1.png"
   image_path_ios: "asset/icons/bus1.png"
+  adaptive_icon_background: "asset/icons/background.png" 
  # can specify file name here e.g. "ic_launcher"
 
 # For information on the generic Dart part of this file, see the

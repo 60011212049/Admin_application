@@ -68,32 +68,6 @@ class _AddBusState extends State<AddBus> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
     List jsonData = json.decode(response.body);
     listBus = jsonData.map((i) => BusModel.fromJson(i)).toList();
-    int tx = int.parse((listBus[listBus.length - 1].cid).substring(6));
-    if (tx >= 99 && tx <= 999) {
-      tx = tx + 1;
-      namecontroller.text =
-          (listBus[listBus.length - 1].cid).substring(0, listBus.length - 2) +
-              tx.toString();
-    } else if (tx >= 9 && tx <= 99) {
-      tx = tx + 1;
-
-      print((listBus[listBus.length - 1].cid)
-          .substring(0, listBus[listBus.length - 1].cid.length - 2));
-      namecontroller.text = (listBus[listBus.length - 1].cid)
-              .substring(0, listBus[listBus.length - 1].cid.length - 2) +
-          tx.toString();
-    } else if (tx < 9) {
-      tx = tx + 1;
-      if (tx == 9) {
-        namecontroller.text =
-            (listBus[listBus.length - 1].cid).substring(0, listBus.length) +
-                tx.toString();
-      } else {
-        namecontroller.text =
-            (listBus[listBus.length - 1].cid).substring(0, listBus.length - 1) +
-                tx.toString();
-      }
-    }
     setState(() {
       loadData = true;
     });
@@ -180,7 +154,6 @@ class _AddBusState extends State<AddBus> {
                         prefixIcon: Icon(Icons.assignment_turned_in),
                       ),
                       controller: namecontroller,
-                      readOnly: true,
                     ),
                   ),
                 ),

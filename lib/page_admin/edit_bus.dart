@@ -25,8 +25,10 @@ class _EditBusState extends State<EditBus> {
   TextEditingController namecontroller = TextEditingController();
   TextEditingController statuscontroller = TextEditingController();
   bool loadData = false;
+  String id;
 
   _EditBusState(BusModel idbus) {
+    this.id = idbus.cId;
     namecontroller.text = idbus.cid;
     if (idbus.cStatus == '1') {
       statuscontroller.text = 'พร้อมใช้งาน';
@@ -79,6 +81,7 @@ class _EditBusState extends State<EditBus> {
 
   Future<Null> updateDataBus() async {
     status['status'] = 'edit';
+    status['id'] = id;
     status['cid'] = namecontroller.text;
     if (statuscontroller.text == 'พร้อมใช้งาน') {
       status['statusbus'] = '1';
@@ -156,7 +159,6 @@ class _EditBusState extends State<EditBus> {
                         prefixIcon: Icon(Icons.assignment_turned_in),
                       ),
                       controller: namecontroller,
-                      readOnly: true,
                     ),
                   ),
                 ),
@@ -198,7 +200,7 @@ class _EditBusState extends State<EditBus> {
                     ),
                     color: Colors.blue[700],
                     child: Text(
-                      "ยืนยันการเพิ่มข้อมูล",
+                      "ยืนยันการแก้ไขข้อมูล",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 27.0,

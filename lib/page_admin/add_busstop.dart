@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:adminapp/custom_icons.dart';
+import 'package:adminapp/model/busstop_model.dart';
 import 'package:adminapp/service/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,15 +27,38 @@ class _AddBusstopState extends State<AddBusstop> {
   var _latitudecontroller = TextEditingController();
   var _longitudecontroller = TextEditingController();
 
+  List<BusstopModel> busstop = List<BusstopModel>();
   Location location = Location();
   LocationData locatNow;
   File image;
   var bit;
   bool nameB = false, latB = false, lngB = false;
+  String _selectedTpye;
+  String idbus;
+  List<String> listName = ['ก่อนจุดแรก'];
 
   @override
   void initState() {
     super.initState();
+    getBusstop();
+  }
+
+  Future<Null> getBusstop() async {
+    status['status'] = 'show';
+    status['id'] = '';
+    String jsonSt = json.encode(status);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busstop_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+    List jsonData = json.decode(response.body);
+    busstop = jsonData.map((i) => BusstopModel.fromJson(i)).toList();
+    busstop.forEach((element) {
+      listName.add(element.sName);
+    });
+    print(listName.length);
+    setState(() {});
+    return null;
   }
 
   Future<Null> addTransciption() async {
@@ -78,8 +102,22 @@ class _AddBusstopState extends State<AddBusstop> {
     }
   }
 
+  Future<void> editIdDataBusstop(String str, String id) async {
+    status.clear();
+    status['status'] = 'editId';
+    status['id_ch'] = str;
+    status['id'] = id;
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busstop_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
   Future<void> _sentDataBusstop() async {
     status['status'] = 'add';
+    status['id_ch'] = (int.parse(this.idbus) + 1).toString();
     status['name'] = _namecontroller.text;
     status['latitude'] = _latitudecontroller.text;
     status['longitude'] = _longitudecontroller.text;
@@ -102,7 +140,7 @@ class _AddBusstopState extends State<AddBusstop> {
             duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
         addTransciption();
         bit = '';
-        Navigator.pop(context);
+        //Navigator.pop(context);
       }
     } else {
       setState(() {
@@ -130,42 +168,45 @@ class _AddBusstopState extends State<AddBusstop> {
           child: ListView(
             children: <Widget>[
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Container(
-                    height: 230,
-                    width: 320,
-                    child: Wrap(
-                      children: <Widget>[
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            (image != null)
-                                ? Center(
-                                    child: ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxHeight: 230,
+                  Center(
+                    child: Container(
+                      height: 230,
+                      width: 320,
+                      child: Wrap(
+                        children: <Widget>[
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              (image != null)
+                                  ? Center(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxHeight: 230,
+                                        ),
+                                        child: Image.file(
+                                          image,
+                                          fit: BoxFit.fill,
+                                        ),
                                       ),
-                                      child: Image.file(
-                                        image,
-                                        fit: BoxFit.fill,
+                                    )
+                                  : Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            5, 10, 5, 10),
+                                        child: Container(
+                                          child: Image.asset(
+                                              'asset/icons/bus-stop1.png'),
+                                          height: ScreenUtil().setHeight(530),
+                                        ),
                                       ),
-                                    ),
-                                  )
-                                : Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          5, 10, 5, 10),
-                                      child: Container(
-                                        child: Image.asset(
-                                            'asset/icons/bus-stop1.png'),
-                                        height: ScreenUtil().setHeight(530),
-                                      ),
-                                    ),
-                                  )
-                          ],
-                        ),
-                      ],
+                                    )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                   Row(
@@ -244,135 +285,29 @@ class _AddBusstopState extends State<AddBusstop> {
                       ),
                     ],
                   ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(35, 0, 30, 0),
+                    child: Text(
+                      'จากจุด',
+                      style: TextStyle(fontSize: ScreenUtil().setSp(60)),
+                    ),
+                  ),
+                  drowdownStart(),
+
                   //******************       username         ************** */
                   Padding(
                     padding: const EdgeInsets.fromLTRB(30, 5, 30, 5),
                     child: Column(
                       children: <Widget>[
-                        Container(
-                          child: TextField(
-                            style: TextStyle(fontSize: 22.0, height: 1.0),
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                nameB = false;
-                              }
-                              setState(() {});
-                            },
-                            decoration: InputDecoration(
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                  width: 2,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              errorStyle: TextStyle(fontSize: 16),
-                              errorText: nameB == true
-                                  ? 'กรุณากรอกชื่อจุดรับส่ง'
-                                  : null,
-                              labelText: 'ชื่อจุดรับส่ง',
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 22.0,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              prefixIcon: Icon(Icons1.pin_1),
-                            ),
-                            controller: _namecontroller,
-                          ),
-                        ),
+                        nameBusstop(),
                         SizedBox(
                           height: ScreenUtil().setSp(30),
                         ),
-                        Container(
-                          child: TextField(
-                            style: TextStyle(
-                              fontSize: 22.0,
-                              height: 1.0,
-                            ),
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                latB = false;
-                              }
-                              setState(() {});
-                            },
-                            decoration: InputDecoration(
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                  width: 2,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              errorStyle: TextStyle(fontSize: 16),
-                              errorText:
-                                  latB == true ? 'กรุณากรอกละติจูด' : null,
-                              labelText: 'ละติจูด',
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: ScreenUtil().setSp(50),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              prefixIcon: Icon(Icons.pin_drop),
-                            ),
-                            controller: _latitudecontroller,
-                          ),
-                        ),
+                        latField(),
                         SizedBox(
                           height: ScreenUtil().setSp(30),
                         ),
-                        Container(
-                          child: TextField(
-                            style: TextStyle(
-                              fontSize: 22.0,
-                              height: 1.0,
-                            ),
-                            onChanged: (value) {
-                              if (value.isNotEmpty) {
-                                lngB = false;
-                              }
-                              setState(() {});
-                            },
-                            decoration: InputDecoration(
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                  width: 2,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              errorStyle: TextStyle(fontSize: 16),
-                              errorText:
-                                  lngB == true ? 'กรุณากรอกลองจิจูด' : null,
-                              labelText: 'ลองจิจูด',
-                              filled: true,
-                              fillColor: Colors.white,
-                              hintStyle: TextStyle(
-                                color: Colors.grey,
-                                fontSize: ScreenUtil().setSp(50),
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
-                              ),
-                              prefixIcon: Icon(Icons.pin_drop),
-                            ),
-                            controller: _longitudecontroller,
-                          ),
-                        ),
+                        longField(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -393,6 +328,8 @@ class _AddBusstopState extends State<AddBusstop> {
                                     locatNow.latitude.toString();
                                 _longitudecontroller.text =
                                     locatNow.longitude.toString();
+                                latB = false;
+                                lngB = false;
                                 setState(() {});
                               },
                             )
@@ -433,7 +370,38 @@ class _AddBusstopState extends State<AddBusstop> {
                                   lngB == false) {
                                 try {
                                   if (image == null) {
-                                    _sentDataBusstop();
+                                    await _sentDataBusstop();
+                                    if (idbus == '0') {
+                                      print('bus after one');
+                                      for (var i = 0; i < busstop.length; i++) {
+                                        await editIdDataBusstop(
+                                            (int.parse(busstop[i].idCheck) + 1)
+                                                .toString(),
+                                            busstop[i].sid);
+                                        print(busstop[i].sid +
+                                            ' : ' +
+                                            (int.parse(busstop[i].idCheck) + 1)
+                                                .toString());
+                                      }
+                                      Navigator.pop(context);
+                                    } else {
+                                      print('bus before one');
+                                      for (var i = 0; i < busstop.length; i++) {
+                                        if (i + 1 > int.parse(this.idbus)) {
+                                          await editIdDataBusstop(
+                                              (int.parse(busstop[i].idCheck) +
+                                                      2)
+                                                  .toString(),
+                                              busstop[i].sid);
+                                          print(busstop[i].sid +
+                                              ' : ' +
+                                              (int.parse(busstop[i].idCheck) +
+                                                      2)
+                                                  .toString());
+                                        }
+                                      }
+                                      Navigator.pop(context);
+                                    }
                                   } else {
                                     final Map<String, dynamic> response =
                                         await _uploadImage();
@@ -458,6 +426,187 @@ class _AddBusstopState extends State<AddBusstop> {
           ),
         ),
       ),
+    );
+  }
+
+  Padding drowdownStart() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(30, 5, 30, 5),
+      child: Container(
+        height: 60,
+        width: ScreenUtil().setWidth(900),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 0, right: 0, bottom: 4, top: 5),
+          child: Container(
+            height: 55,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                color: Color(0xFFF2F2F2)),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                iconEnabledColor: Color(0xFF595959),
+                items: listName.map((value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    onTap: () {
+                      print(value);
+                      setState(() {});
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 0, 0),
+                      child: Wrap(
+                        children: [
+                          value == 'ก่อนจุดแรก'
+                              ? Text(
+                                  value,
+                                  style: TextStyle(fontSize: 17),
+                                )
+                              : Text(
+                                  'หลัง' + value,
+                                  style: TextStyle(fontSize: 17),
+                                ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+                hint: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Text(
+                    'กรุณาเลือกตำแหน่งที่ต้องการเพิ่ม',
+                    style: TextStyle(color: Color(0xFF8B8B8B), fontSize: 17),
+                  ),
+                ), // setting hint
+                onChanged: (String value) {
+                  setState(() {
+                    if (value != 'ก่อนจุดแรก') {
+                      this.idbus = busstop
+                          .firstWhere((element) => element.sName == value)
+                          .idCheck;
+                      print(this.idbus);
+                    } else {
+                      this.idbus = '0';
+                    }
+                    _selectedTpye = value; // saving the selected value
+                  });
+                },
+                value: _selectedTpye, // displaying the selected value
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  TextField longField() {
+    return TextField(
+      style: TextStyle(
+        fontSize: 22.0,
+        height: 1.0,
+      ),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          lngB = false;
+        }
+        setState(() {});
+      },
+      decoration: InputDecoration(
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+        errorStyle: TextStyle(fontSize: 16),
+        errorText: lngB == true ? 'กรุณากรอกลองจิจูด' : null,
+        labelText: 'ลองจิจูด',
+        filled: true,
+        fillColor: Colors.white,
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: ScreenUtil().setSp(50),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+        prefixIcon: Icon(Icons.pin_drop),
+      ),
+      controller: _longitudecontroller,
+    );
+  }
+
+  TextField latField() {
+    return TextField(
+      style: TextStyle(
+        fontSize: 22.0,
+        height: 1.0,
+      ),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          latB = false;
+        }
+        setState(() {});
+      },
+      decoration: InputDecoration(
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+        errorStyle: TextStyle(fontSize: 16),
+        errorText: latB == true ? 'กรุณากรอกละติจูด' : null,
+        labelText: 'ละติจูด',
+        filled: true,
+        fillColor: Colors.white,
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: ScreenUtil().setSp(50),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+        prefixIcon: Icon(Icons.pin_drop),
+      ),
+      controller: _latitudecontroller,
+    );
+  }
+
+  TextField nameBusstop() {
+    return TextField(
+      style: TextStyle(fontSize: 22.0, height: 1.0),
+      onChanged: (value) {
+        if (value.isNotEmpty) {
+          nameB = false;
+        }
+        setState(() {});
+      },
+      decoration: InputDecoration(
+        errorBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: Colors.red,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+        errorStyle: TextStyle(fontSize: 16),
+        errorText: nameB == true ? 'กรุณากรอกชื่อจุดรับส่ง' : null,
+        labelText: 'ชื่อจุดรับส่ง',
+        filled: true,
+        fillColor: Colors.white,
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: 22.0,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+        ),
+        prefixIcon: Icon(Icons1.pin_1),
+      ),
+      controller: _namecontroller,
     );
   }
 }

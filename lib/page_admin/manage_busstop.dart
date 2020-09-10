@@ -45,6 +45,19 @@ class _ManageBusstopState extends State<ManageBusstop> {
         headers: {HttpHeaders.contentTypeHeader: 'application/json'});
   }
 
+  Future<void> editIdDataBusstop(String str, String id) async {
+    status.clear();
+    status['status'] = 'editId';
+    status['id_ch'] = str;
+    status['id'] = id;
+    String jsonSt = json.encode(status);
+    print(jsonSt);
+    var response = await http.post(
+        'http://' + Service.ip + '/controlModel/busstop_model.php',
+        body: jsonSt,
+        headers: {HttpHeaders.contentTypeHeader: 'application/json'});
+  }
+
   Future<Null> getBusstop() async {
     busForSearch.clear();
     status['status'] = 'show';
@@ -206,11 +219,14 @@ class _ManageBusstopState extends State<ManageBusstop> {
               itemBuilder: (BuildContext context, int index) {
                 return Card(
                   child: ListTile(
+                    leading: CircleAvatar(
+                      child: Text(busForSearch[index].idCheck),
+                    ),
                     title: Text(
                       busForSearch[index].sName,
                       style: TextStyle(
                         color: Colors.grey[800],
-                        fontSize: 18.0,
+                        fontSize: ScreenUtil().setSp(45),
                       ),
                     ),
                     trailing: Wrap(
@@ -234,8 +250,35 @@ class _ManageBusstopState extends State<ManageBusstop> {
                             Icons1.delete,
                             color: Colors.red,
                           ),
-                          onPressed: () {
-                            deleteDriver(busForSearch[index].sid);
+                          onPressed: () async {
+                            print(busForSearch[index].idCheck);
+                            if (busForSearch[index].idCheck == '1') {
+                              for (var i = 1; i < busstop.length; i++) {
+                                await editIdDataBusstop(
+                                    (int.parse(busstop[i].idCheck) - 1)
+                                        .toString(),
+                                    busstop[i].sid);
+                                print(busstop[i].sid +
+                                    ' : ' +
+                                    (int.parse(busstop[i].idCheck) - 1)
+                                        .toString());
+                              }
+                            } else {
+                              for (var i = 0; i < busstop.length; i++) {
+                                if (i + 1 >
+                                    int.parse(busForSearch[index].idCheck)) {
+                                  await editIdDataBusstop(
+                                      (i - 1).toString(), busstop[i].sid);
+                                  print(busstop[i].sid +
+                                      ' : ' +
+                                      (int.parse(busstop[i].idCheck) - 1)
+                                          .toString());
+                                }
+                              }
+                            }
+                            // getBusstop();
+                            // setState(() {});
+                            // deleteDriver(busForSearch[index].sid);
                           },
                         ),
                       ],

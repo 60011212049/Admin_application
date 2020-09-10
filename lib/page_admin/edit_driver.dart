@@ -867,11 +867,11 @@ class _EditBusDriverState extends State<EditBusDriver> {
       child: new SimpleDialog(
         title: new Text('กรุณาเลือกรถราง'),
         children: <Widget>[
-          for (var i = 1; i <= bus.length; i++)
+          for (var i = 0; i < bus.length; i++)
             SimpleDialogOption(
-              child: textSize('รถรางคันที่ ' + i.toString()),
+              child: textSize('รถราง ' + bus[i].cid),
               onPressed: () {
-                Navigator.pop(context, bus[i - 1].cid);
+                Navigator.pop(context, bus[i].cid);
               },
             ),
         ],
